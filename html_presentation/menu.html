@@ -1,0 +1,104 @@
+<style>
+	#menu {
+		margin-top: 10px;
+	}
+	
+	#menu ul {
+		margin: 0;
+		padding:0;
+		list-style: none;
+		width: 100%
+		
+	}
+	#menu ul a {
+		display:block;
+		background: darkgreen;
+		color: white;
+		text-decoration: none;
+		padding: 0.6em 2em;
+		letter-spacing: 2px;
+		position: relative;
+	}
+	#menu > ul {
+		vertical-align: top;
+		display: inline-block;
+	}
+	#menu > ul li {
+		position: relative;
+	}
+	#menu > ul > li {
+		float: left;
+		margin-right: 1px;
+		border-bottom: 3px green solid; 
+	}
+	
+	/*
+	#menu > ul li:last-child {
+	}
+	*/
+	
+	#menu > ul li:hover > a {
+		color:gold;
+	}
+	#menu > ul li li a {
+		margin-top: 1px;
+	}
+	
+	#menu ul ul {
+		position: absolute;
+		white-space: nowrap;
+		z-index: 1;
+		left: -99999em;
+		
+		/*
+		margin: 3px;
+		margin-left: 0;
+		*/
+	}
+	#menu ul ul a{
+		background: green;
+		/* border: 1px solid beige; */
+	}
+	#menu ul > li:hover > ul {
+		left: auto;
+		padding-top: 3px;
+		min-width: 100%;
+	}
+</style>
+<div id="menu">
+	<ul>
+		<li>
+			<a>{portfolio} ({value})</a>
+			<ul>
+				<li><a href="?p=portfolio1">portfolio1 ($7245.81)</a></li>
+				<li><a href="?p=portfolio2">portfolio2 ($5000.00)</a></li>
+				<li><a href="?p=portfolio3">portfolio3 ($3431.26)</a></li>
+				<li><a href="?p=portfolio4">portfolio4 ($5509.90)</a></li>
+				<li><a href="#">+ new portfolio</a></li>
+			</ul>
+		</li>
+		<li>
+			<a>Stocks</a>
+			<ul>
+				<li><a href="#">Find</a></li>
+				<li><a href="#">Buy</a></li>
+				<li><a href="#">Sell</a></li>
+				<li><a href="#">History</a></li>
+			</ul>
+		</li>
+		<li>
+			<a>Competitions</a>
+			<ul>
+				<li><a href="#">Create</a></li>
+				<li><a href="#">Play</a></li>
+				<li><a href="#">Join</a></li>
+			</ul>
+		</li>
+		<li>
+			<a href="#">What If?</a>
+		</li>
+		<li>
+			<a>About</a>
+		</li>
+	</ul>
+</div>
