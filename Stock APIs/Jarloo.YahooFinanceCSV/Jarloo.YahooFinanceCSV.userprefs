@@ -1,0 +1,13 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jarloo.YahooFinanceCSV/Program.cs">
+    <Files>
+      <File FileName="Jarloo.YahooFinanceCSV/YahooFinance.cs" Line="1" Column="1" />
+      <File FileName="Jarloo.YahooFinanceCSV/Program.cs" Line="16" Column="105" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
