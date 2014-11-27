@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>G.R.E.E.D.</title>
+		<link rel="stylesheet" type="text/css" href="index.css">
+		<link rel="stylesheet" type="text/css" href="header.css">
+		<script src="jquery.min.js"></script>
+		<script src="index.js"></script>
+		<script>
+		</script>
+	</head>
+	<body>
+		<!--#include virtual="header.shtml" -->
+		<div id="header">
+		</div>
+		<div id="sidebar">
+		</div>
+		<div id="content">
+		</div>
+	</body>
+</html>
