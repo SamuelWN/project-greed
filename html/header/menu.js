@@ -25,6 +25,12 @@ function menu_portfolio_a(portfolio) {
 	return a;
 }
 
+function menu_portfolio_li(portfolio) {
+	var li = document.createElement("li");
+	li.appendChild(menu_portfolio_a(portfolio));
+	return li;
+}
+
 function menu_portfolio_ul(portfolioList) {
 	var ul = document.createElement("ul");
 	for (var portfolio in portfolioList) {
@@ -59,6 +65,3 @@ function build_menu_portfolio(li, portfolioCurrent, portfolioList) {
 var menu_portfolio = document.getElementById("menu_portfolio");
 menu_portfolio.appendChild(menu_portfolio_a(myPortfolios[currentPortfolio]));
 menu_portfolio.appendChild(menu_portfolio_ul(myPortfolios));
-
-
-
