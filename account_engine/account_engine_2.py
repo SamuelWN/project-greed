@@ -11,6 +11,15 @@ import sys
 import getopt
 #import string
 
+
+# DEBUGGING NOTICE
+# https://docs.python.org/2/library/pdb.html
+# import "pdb" (python debugger), and place "pdb.set_trace()" in the code where you want a breakpoint.
+# when at a breakpoint when running the code, type "c" to continue, "locals()" to see all local variables, and "globals()" to see all global variables
+# http://pythonconquerstheuniverse.wordpress.com/2009/09/10/debugging-in-python/
+import pdb
+
+
 num_users = 0
 
 
@@ -18,13 +27,18 @@ def connect():
     return mdb.connect(host="localhost", user="root", passwd="toor", db="greed")
 
 
-def main(argv):
+def main():
     try:
-        opts, args = getopt.getopt(argv, "ha:f:tA")
+
+
+
+# http://stackoverflow.com/questions/1540365/why-isnt-getopt-working-if-sys-argv-is-passed-fully
+# I changed sys.argv to sys.argv[1:], so that getopt would work as intended
+
+        opts, args = getopt.getopt(sys.argv[1:], "ha:f:tA")
     except getopt.GetoptError:
         print
         sys.exit(2)
-
     for opt, arg in opts:
         if opt == '-h':
             print
@@ -157,3 +171,18 @@ def top_5():
             print(("%s\n" % (a_ret)))
 
         return ret
+
+
+
+
+
+
+
+
+
+
+
+# python is interpreted - it needs to actually be told to run your "main" method
+
+if __name__ == "__main__":
+    sys.exit(main())
