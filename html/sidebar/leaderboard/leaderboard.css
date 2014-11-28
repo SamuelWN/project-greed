@@ -1,0 +1,35 @@
+#leaderboard {
+	padding: 0;
+	margin-right: 8px;
+}
+
+#leaderboard .leaderboard_title {
+	font-size: large;
+	font-weight: bold;
+	margin-top: 4px;
+	text-align: center;
+}
+
+#leaderboard  > ol {
+	margin-top: 8px;
+	margin-left: 0;
+}
+
+
+
+#leaderboard li > dl {
+	margin: 0;
+	margin-bottom: 0.6em;
+}
+
+#leaderboard dt {
+	font-weight: bold;
+}
+
+#leaderboard dd {
+	display: inline-block;
+}
+
+#leaderboard .leaderboard_portfolio {
+	font-style: italic;
+}

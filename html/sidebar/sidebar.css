@@ -1,5 +1,7 @@
+@import url("leaderboard/leaderboard.css");
+
 #sidebar {
 	background: red;
 	
-	width: 20%;
+	width: 10%;
 }

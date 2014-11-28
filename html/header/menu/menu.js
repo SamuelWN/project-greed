@@ -15,13 +15,22 @@ var currentPortfolio = 0;
 
 function menu_portfolio_a(portfolio) {
 	var a = document.createElement("a");
-	var textNode;
+	
 	if (portfolio === undefined) {
-		textNode = document.createTextNode("+ new portfolio");
+		a.appendChild(document.createTextNode("+ new portfolio"));
 	} else {
-		textNode = document.createTextNode(portfolio.name + " [" + portfolio.value + "]");
+		
+		var span = document.createElement("span");
+		span.appendChild(document.createTextNode(portfolio.value));
+		span.className = "dollars";
+		
+		a.appendChild(document.createTextNode(portfolio.name + " ["));
+		a.appendChild(span);
+		a.appendChild(document.createTextNode("]"));
+		
+		/*textNode = document.createTextNode(portfolio.name + " [" + portfolio.value + "]"); */
 	}
-	a.appendChild(textNode);
+	/* a.appendChild(textNode); */
 	a.setAttribute("href", "#")
 	return a;
 }

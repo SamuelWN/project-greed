@@ -27,11 +27,20 @@ html {
 
 #area {
 	display: table;
+	width: calc(100% - 16px);
 	height: 100%;
-	width: 100%;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 4px;
+	padding-bottom: 8px;
 }
 
 
 #area > div {
 	display: table-cell;
+}
+
+
+.dollars:before {
+	content: "$";
 }
