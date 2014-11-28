@@ -8,8 +8,8 @@
 
 import MySQLdb as mdb
 import sys
-import argparse
-import string
+import getopt
+#import string
 
 num_users = 0
 
@@ -18,20 +18,24 @@ def connect():
     return mdb.connect(host="localhost", user="root", passwd="toor", db="greed")
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Account Database Engine.')
-    parser.add_argument('username', metavar='U', type=string, nargs=1, help='username')
-    parser.add_argument('id', metavar='I', type=int, nargs=1, help='user id')
-    parser.add_argument('-r', '--reconnect', dest='rc', help='reconnect to database')
-    parser.add_argument('-a', '--add', dest='add', action='store_const', help='add a user to the database')
-    parser.add_argument('-f', '--find', dest='find', action='store_const', help='find a user in the database')
-    parser.add_argument('-t', '--top5', dest='top', help='retrieve the users with the 5 greatest liquid assets')
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv, "ha:f:tA")
+    except getopt.GetoptError:
+        print
+        sys.exit(2)
 
-
-
-#    opt = optparse.OptionParser()
-#    opt.add_option("-i", "--insert", ation="store", type="string", dest="database")
-#    opt.add_option("-A", "--all", action )
+    for opt, arg in opts:
+        if opt == '-h':
+            print
+        elif opt == '-a':
+            add_user(arg)
+        elif opt == 'f':
+            find_user(arg)
+        elif opt == '-t':
+            top_5()
+        elif opt == '-A':
+            all()
 
 
 def add_user(uname):
