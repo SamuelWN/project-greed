@@ -1,0 +1,7 @@
+<div id="header">
+	<div id="header_area">
+		<!--#include virtual="logo/logo.shtml" -->
+		<!--#include virtual="account/account.shtml" -->
+	</div>
+	<!--#include virtual="menu/menu.shtml" -->
+</div>

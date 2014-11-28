@@ -1,5 +1,0 @@
-<div id="header">
-	<!--#include virtual="header/logo.html" -->
-	<!--#include virtual="header/account.html" -->
-	<!--#include virtual="header/menu.html" -->
-</div>

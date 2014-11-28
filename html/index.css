@@ -1,37 +1,37 @@
+@import url("header/header.css");
+@import url("sidebar/sidebar.css");
+@import url("content/content.css");
+@import url("footer/footer.css");
+
 html {
-	background-color: darkgreen;
 	background-image: linear-gradient(green, darkgreen);
-	
+	background-repeat: no-repeat;
+	background-color: darkgreen;
 	height: 100%;
 }
 
-body {
+#page {
 	background-color: linen;
+	
+	height: 95%;
 	width: 85%;
+	
 	margin: auto;
 	margin-top: 10px;
-	padding: 5px;
+	margin-bottom: 20px;
+	
 	padding-top: 0;
 	padding-bottom: 0;
-	min-height: 95%;	
 	box-shadow: 3px 3px 10px 5px rgba(0,0,0,0.5);
 }
 
-#header {
+#area {
+	display: table;
+	height: 100%;
 	width: 100%;
-	margin: auto;
-	
-	padding-bottom: 10px;
 }
 
-#sidebar {
-	float: right;
-	width: 25%;
-	padding: 10px;
-}
 
-#content {
-	width: 70%;
-	float: left;
-	padding: 10px;
+#area > div {
+	display: table-cell;
 }

@@ -1,0 +1,27 @@
+<div id="menu">
+	<ul>
+		<li id="menu_portfolio">
+		</li>
+		<li id="menu_stocks">
+			<a href="#">Stocks</a>
+			<ul>
+				<li>
+					<a href="#">Find</a>
+				</li>
+			</ul>
+		</li>
+		<li id="menu_competitions">
+			<a href="#">Competitions</a>
+			<ul>
+				<li>
+					<a href="#">Find</a>
+				</li>
+			</ul>
+		</li>
+		<li id="menu_whatif">
+		</li>
+		<li id="menu_about">
+			<a href="#">About</a>
+		</li>
+	</ul>
+</div>

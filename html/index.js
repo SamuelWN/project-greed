@@ -10,8 +10,10 @@ function include(filename) {
 	}
 }
 
+/*
 function include_jquery() {
 	include("jquery.min.js");
 }
+*/
 
-include("header.js");
+include("header/header.js");
