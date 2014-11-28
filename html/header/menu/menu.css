@@ -1,0 +1,95 @@
+/* all ul */	
+#menu ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	width: 100%;
+	background: darkgreen;
+	float: left;
+	clear: both;
+}
+
+/* 1st tier ul */
+#menu > ul {
+	vertical-align: top;
+	display: inline-block;
+	height: 100%;
+	border-bottom: 4px green solid;
+}
+
+/* 2nd tier ul */
+#menu ul ul {
+	position: absolute;
+	white-space: nowrap;
+	z-index: 2;
+	left: -99999em;
+	background: transparent;
+	border: 4px transparent solid;
+	margin-left: -4px;
+}
+#menu ul > li:hover > ul {
+	left: auto;
+	min-width: 100%;
+}
+
+
+
+/* all li */
+#menu li {
+	position: relative;
+}
+
+/* 1st tier li */
+#menu > ul > li {
+	float: left;
+	margin-right: 4px;
+}
+#menu > ul > li:last-child {
+	margin-right: 0;
+}
+
+/* 2nd tier li */
+#menu ul ul li {
+	border-top: 1px black solid;
+}
+#menu ul li li:first-child  {
+	border-top: 0;
+}
+
+
+
+
+
+/* all a */
+#menu a {
+	display:block;
+	background: darkgreen;
+	color: white;
+	text-decoration: none;
+	padding: 0.5em 2em;
+	letter-spacing: 1px;
+	position: relative;
+}
+
+/* 1st tier a */
+#menu > ul > li > a {
+	left: auto;
+	top: auto;
+	font-weight: bold;
+	z-index: 1;
+}
+
+/* 2nd tier a */
+#menu ul ul a{
+	background: green;
+}
+
+
+#menu li:hover > a {
+	color:gold;
+}
+
+#menu > ul > li:hover > a {
+	border-bottom: 4px gold solid;
+	margin-bottom: -4px;
+}

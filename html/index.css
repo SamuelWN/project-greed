@@ -1,0 +1,37 @@
+@import url("header/header.css");
+@import url("sidebar/sidebar.css");
+@import url("content/content.css");
+@import url("footer/footer.css");
+
+html {
+	background-image: linear-gradient(green, darkgreen);
+	background-repeat: no-repeat;
+	background-color: darkgreen;
+	height: 100%;
+}
+
+#page {
+	background-color: linen;
+	
+	height: 95%;
+	width: 85%;
+	
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	
+	padding-top: 0;
+	padding-bottom: 0;
+	box-shadow: 3px 3px 10px 5px rgba(0,0,0,0.5);
+}
+
+#area {
+	display: table;
+	height: 100%;
+	width: 100%;
+}
+
+
+#area > div {
+	display: table-cell;
+}
