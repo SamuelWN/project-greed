@@ -30,18 +30,16 @@ def connect():
 def main():
     try:
 
-
-
 # http://stackoverflow.com/questions/1540365/why-isnt-getopt-working-if-sys-argv-is-passed-fully
 # I changed sys.argv to sys.argv[1:], so that getopt would work as intended
 
         opts, args = getopt.getopt(sys.argv[1:], "ha:f:tA")
     except getopt.GetoptError:
-        print
+        print()
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print
+            print(arg)
         elif opt == '-a':
             add_user(arg)
         elif opt == 'f':
@@ -55,17 +53,16 @@ def main():
 def add_user(uname):
     print(("add_user"))
 
+    uid = 0
+
     try:
 
         con = connect()
         cur = con.cursor()
 
-        global num_users
-        uid = num_users
-        cur.execute("INSERT INTO account (id, username) VALUES (" + uid + ", '" + uname + "');")
-        cur.execute("INSERT INTO super_portfolio (account_id, name, initial_cash) VALUES(" + uid + ", '" + uname + "', " + 100000 + "');")
-
-        num_users = num_users + 1
+        cur.execute("INSERT INTO account (username) VALUES (uname);")
+        uid = find_user(uname)
+        cur.execute("INSERT INTO super_portfolio (account_id, name, initial_cash) VALUES(" + uid + "'" + uname + "', " + 100000 + "');")
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -77,9 +74,7 @@ def add_user(uname):
             con.close()
 
 # Testing:
-        print(uid)
-
-        return uid
+        print()
 
 
 def find_user(uname):
@@ -87,7 +82,7 @@ def find_user(uname):
         con = connect()
         cur = con.cursor()
 
-        cur.execute("SELECT id FROM account WHERE username = '" + uname + "';")
+        cur.execute("SELECT id FROM greed.account WHERE username = '" + uname + "';")
         uid = cur.fetchone()
 
     except mdb.Error as e:
@@ -112,7 +107,7 @@ def all():
         con = connect()
         cur = con.cursor()
 
-        ret = cur.execute("""SELECT * FROM account;""")
+        cur.execute("""SELECT * FROM account;""")
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -123,39 +118,67 @@ def all():
             con.commit()
             con.close()
 
-        for a in ret:
-            print(a)
+    for n in range(cur.rowcount):
+        row = cur.fetchone()
+        print (row)
 
 
 def top_5():
+    ret = [[0.00, ""], [0.00, ""], [0.00, ""], [0.00, ""], [0.00, ""]]
     try:
         con = connect()
         cur = con.cursor()
 
-        cmd = cur.execute("""SELECT * FROM account;""")
-        accounts = cmd.fetchall()
+#        cmd = cur.execute("""SELECT * FROM account;""")
+#        accounts = cmd.fetchall()
+#        for acnt in accounts:
 
-        sums = [][2]
-        for acnt in accounts:
-            sums[acnt][0] = accounts[2]
-            sums[acnt][1] = cur.execute("SUM(SELECT portfolio_main.cash FROM portfolio_main WHERE owner_account_id = '" + "acnt.id');")
+        cur.execute("""SELECT * FROM account;""")
 
-            import numpy as np
+        sums = [[0, ""] for x in range(cur.rowcount)]
+#        print(("cur.rowcount: "))
+#        print ((cur.rowcount))
+
+        for n in range(cur.rowcount):
+            row = cur.fetchone()
+#            print(('row[', n, '] = ', row))
+
+            vals = str(row).split("L, '")
+            vals[0] = (vals[0])[1:]
+            sums[n][0] = int(vals[0])
+            sums[n][1] = str(vals[1]).split("')")[0]
+
+#TESTING:
+            print(("ID:"))
+            print((sums[n][0]))
+            print(("Username:"))
+            print((sums[n][1]))
+
+            sums[n][0] = cur.execute("SUM(SELECT * FROM portfolio_cash WHERE owner_account_id = " + sums[n][0] + ");")
+
+#TESTING:
+            print(("Username:"))
+            print((sums[n][1]))
+            print(("Cash:"))
+            print((sums[n][0]))
+
+
+        import numpy as np
 
         sums = np.array(sums)
         sums.sort(axis=1, kind='mergesort')
+        ordered_sums = reversed(sums)
 
-        ret = [5][2]
-        ret[0][0] = reversed(sums)[0][0]
-        ret[0][1] = reversed(sums)[0][0]
-        ret[1][0] = reversed(sums)[1][0]
-        ret[1][1] = reversed(sums)[1][1]
-        ret[2][0] = reversed(sums)[2][0]
-        ret[2][1] = reversed(sums)[2][1]
-        ret[3][0] = reversed(sums)[3][0]
-        ret[3][1] = reversed(sums)[3][1]
-        ret[4][0] = reversed(sums)[4][0]
-        ret[4][1] = reversed(sums)[4][1]
+        ret[0][0] = ordered_sums[0][0]
+        ret[0][1] = ordered_sums[0][0]
+        ret[1][0] = ordered_sums[1][0]
+        ret[1][1] = ordered_sums[1][1]
+        ret[2][0] = ordered_sums[2][0]
+        ret[2][1] = ordered_sums[2][1]
+        ret[3][0] = ordered_sums[3][0]
+        ret[3][1] = ordered_sums[3][1]
+        ret[4][0] = ordered_sums[4][0]
+        ret[4][1] = ordered_sums[4][1]
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -167,9 +190,18 @@ def top_5():
             con.close()
 
 # Testing:
-        for a_ret in ret:
-            print(("%s\n" % (a_ret)))
+        '''for a_ret in ret:
+            for val in a_ret:
+                print (val)
+            print(("\n"))
 
+#            print(a_ret[0])
+ #           print(("    $")
+  #          print(a_ret[1])
+   #         print(("\n"))
+        #print('\n'.join([''.join(['{:4}'.format(item) for item in row])
+        #  for row in ret]))
+'''
         return ret
 
 
