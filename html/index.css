@@ -14,7 +14,9 @@ html {
 	background-color: linen;
 	
 	height: 95%;
-	width: 85%;
+	width: 90%;
+	
+	min-width: 800px;
 	
 	margin: auto;
 	margin-top: 10px;
@@ -29,15 +31,17 @@ html {
 	display: table;
 	width: calc(100% - 16px);
 	height: 100%;
-	padding-left: 8px;
-	padding-right: 8px;
+	padding: 8px;
 	padding-top: 4px;
-	padding-bottom: 8px;
 }
 
 
 #area > div {
 	display: table-cell;
+}
+
+#area_spacer {
+	width: 8px;
 }
 
 

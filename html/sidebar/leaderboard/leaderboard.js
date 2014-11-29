@@ -8,7 +8,7 @@ function TopPortfolio(id, name, accountid, username, value) {
 
 // TODO: make this apply to actual top portfolios
 var topPortfolios = [
-	//new TopPortfolio(9, "TheWinner", 3, "gdimitoglou", 99999),
+	new TopPortfolio(9, "TheWinnerHasAVeryLongName", 3, "gdimitoglou", 99999),
 	new TopPortfolio(5, "Portfolio3", 1, "myura", 50000),
 	//new TopPortfolio(6, "AnotherPort", 2, "pwallice", 43298),
 	new TopPortfolio(2, "Portfolio2", 1, "myura", 20020),
