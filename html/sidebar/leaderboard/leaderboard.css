@@ -1,6 +1,6 @@
 #leaderboard {
-	padding-left: 12px;
-	padding-right: 12px;
+	padding-left: 4px;
+	padding-right: 2px;
 	padding-top: 8px;
 	padding-bottom: 8px;
 }
@@ -32,6 +32,10 @@
 
 #leaderboard dd {
 	display: block;
+	margin-left: 1.5em;
+	
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 #leaderboard .leaderboard_portfolio {

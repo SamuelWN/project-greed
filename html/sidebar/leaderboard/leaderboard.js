@@ -20,8 +20,10 @@ var topPortfolios = [
 <li>
 	<dl>
 		<dt>{username}</dt>
-		<dd class="leaderboard_portfolio">{portfolio name}</dd>
-		<dd class="leaderboard_value dollars">{portfolio value}</dd>
+		<a>
+			<dd class="leaderboard_portfolio">{portfolio name}</dd>
+			<dd class="leaderboard_value dollars">{portfolio value}</dd>
+		</a>
 	</dl>
 </li>
 */
@@ -34,6 +36,9 @@ function leaderboard_li(topPortfolio) {
 	var dt = document.createElement("dt");
 	dt.appendChild(document.createTextNode(topPortfolio.username));
 	
+	var a = document.createElement("a");
+	a.setAttribute("href", "#");
+	
 	var dd_portfolio = document.createElement("dd");
 	dd_portfolio.className = "leaderboard_portfolio";
 	dd_portfolio.appendChild(document.createTextNode(topPortfolio.name));
@@ -42,9 +47,12 @@ function leaderboard_li(topPortfolio) {
 	dd_value.className = "leaderboard_value dollars";
 	dd_value.appendChild(document.createTextNode(topPortfolio.value));
 	
+	a.appendChild(dd_portfolio);
+	a.appendChild(dd_value);
+	
+	dt.appendChild(a);
+	
 	dl.appendChild(dt);
-	dl.appendChild(dd_portfolio);
-	dl.appendChild(dd_value);
 	
 	li.appendChild(dl);
 	return li;
