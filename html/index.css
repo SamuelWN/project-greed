@@ -14,7 +14,9 @@ html {
 	background-color: linen;
 	
 	height: 95%;
-	width: 85%;
+	width: 90%;
+	
+	min-width: 800px;
 	
 	margin: auto;
 	margin-top: 10px;
@@ -27,11 +29,22 @@ html {
 
 #area {
 	display: table;
+	width: calc(100% - 16px);
 	height: 100%;
-	width: 100%;
+	padding: 8px;
+	padding-top: 4px;
 }
 
 
 #area > div {
 	display: table-cell;
+}
+
+#area_spacer {
+	width: 8px;
+}
+
+
+.dollars:before {
+	content: "$";
 }

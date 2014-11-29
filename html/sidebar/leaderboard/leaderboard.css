@@ -1,0 +1,39 @@
+#leaderboard {
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+#leaderboard .leaderboard_title {
+	font-size: large;
+	font-weight: bold;
+	margin-top: 4px;
+	text-align: center;
+}
+
+#leaderboard  > ol {
+	margin: 0;
+	margin-top: 12px;
+	
+	padding: 0;
+	list-style-type: decimal;
+	list-style-position:inside;
+}
+
+#leaderboard li > dl {
+	margin: 0;
+	margin-bottom: 0.6em;
+}
+
+#leaderboard dt {
+	font-weight: bold;
+}
+
+#leaderboard dd {
+	display: block;
+}
+
+#leaderboard .leaderboard_portfolio {
+	font-style: italic;
+}

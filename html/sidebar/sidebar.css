@@ -1,5 +1,16 @@
+@import url("leaderboard/leaderboard.css");
+
 #sidebar {
-	background: red;
+	padding: 2px;
 	
-	width: 20%;
+	background: transparent; 
+	background: rgba(222, 184, 135, 0.75);	/* burlywood */
+	
+	/* max-width: 250px; */
+	max-width: 175px;
+	min-width: 50px;
+	width: 15%;
+	overflow: hidden;
+	
+	border-radius: 4px;
 }

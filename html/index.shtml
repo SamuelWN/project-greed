@@ -12,6 +12,7 @@
 			<!--#include virtual="header/header.shtml" -->
 			<div id="area">
 				<!--#include virtual="content/content.shtml" -->
+				<div id="area_spacer"></div>
 				<!--#include virtual="sidebar/sidebar.shtml" -->
 			</div>
 		</div>
