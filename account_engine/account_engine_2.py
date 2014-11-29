@@ -8,10 +8,6 @@
 
 import MySQLdb as mdb
 import sys
-import getopt
-import argparse
-import string
-
 
 # DEBUGGING NOTICE
 # https://docs.python.org/2/library/pdb.html
@@ -29,8 +25,6 @@ def connect():
 
 
 def main():
-
-
 # http://stackoverflow.com/questions/1540365/why-isnt-getopt-working-if-sys-argv-is-passed-fully
 # I changed sys.argv to sys.argv[1:], so that getopt would work as intended
 
@@ -40,7 +34,7 @@ def main():
         print()
     elif opt == '-a':
         add_user(sys.argv[1:][1])
-    elif opt == 'f':
+    elif opt == '-f':
         find_user(sys.argv[1:][1])
     elif opt == '-t':
         top_5()
@@ -51,15 +45,17 @@ def main():
 def add_user(uname):
     print(("add_user"))
 
-    uid = 0
+    #uid = 0
 
     try:
         con = connect()
         cur = con.cursor()
 
         cur.execute("INSERT INTO account (username) VALUES ('" + uname + "');")
-        uid = find_user(uname)
-        cur.execute("INSERT INTO super_portfolio (account_id, name, initial_cash) VALUES(" + uid + ", '" + uname + "', 100000);")
+        statement = """INSERT INTO super_portfolio
+                    (account_id, name, initial_cash)
+                    VALUES('%i', '%s', 100000);""" % (find_user(uname), uname)
+        cur.execute(statement)
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -80,7 +76,10 @@ def find_user(uname):
         cur = con.cursor()
 
         cur.execute("SELECT id FROM greed.account WHERE username = '" + uname + "';")
+
         uid = cur.fetchone()
+        uid = str(uid).split('L')[0]
+        userid = int((uid)[1:])
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -92,9 +91,9 @@ def find_user(uname):
             con.close()
 
 # Testing:
-        print(uid)
+        print userid
 
-        return uid
+        return userid
 
 
 # Testing:
@@ -135,7 +134,7 @@ def top_5():
 
             vals = str(row).split("L, '")
             vals[0] = (vals[0])[1:]
-            sums[n][0] = int(vals[0])
+            uid = int(vals[0])
             sums[n][1] = str(vals[1]).split("')")[0]
 
 #TESTING:
@@ -144,14 +143,20 @@ def top_5():
             print(("Username:"))
             print((sums[n][1]))
 
-            sums[n][0] = cur.execute("SUM(SELECT * FROM portfolio_cash WHERE owner_account_id = " + sums[n][0] + ");")
+################################################################################
+#    NEED TO CHANGE STATEMENT TO USE:                                          #
+#        portforlio_value_stock + portfolio_value_cash                         #
+################################################################################
+
+            statement = """SUM(SELECT * FROM portfolio_value_cash
+                            WHERE owner_account_id = '%i');""" % (uid)
+            sums[n][0] = cur.execute(statement)
 
 #TESTING:
             print(("Username:"))
             print((sums[n][1]))
             print(("Cash:"))
             print((sums[n][0]))
-
 
         import numpy as np
 
