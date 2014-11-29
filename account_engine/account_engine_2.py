@@ -9,7 +9,8 @@
 import MySQLdb as mdb
 import sys
 import getopt
-#import string
+import argparse
+import string
 
 
 # DEBUGGING NOTICE
@@ -28,26 +29,23 @@ def connect():
 
 
 def main():
-    try:
+
 
 # http://stackoverflow.com/questions/1540365/why-isnt-getopt-working-if-sys-argv-is-passed-fully
 # I changed sys.argv to sys.argv[1:], so that getopt would work as intended
 
-        opts, args = getopt.getopt(sys.argv[1:], "ha:f:tA")
-    except getopt.GetoptError:
+    opt = sys.argv[1:][0]
+
+    if opt == '-h':
         print()
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print(arg)
-        elif opt == '-a':
-            add_user(arg)
-        elif opt == 'f':
-            find_user(arg)
-        elif opt == '-t':
-            top_5()
-        elif opt == '-A':
-            all()
+    elif opt == '-a':
+        add_user(sys.argv[1:][1])
+    elif opt == 'f':
+        find_user(sys.argv[1:][1])
+    elif opt == '-t':
+        top_5()
+    elif opt == '-A':
+        all()
 
 
 def add_user(uname):
@@ -56,13 +54,12 @@ def add_user(uname):
     uid = 0
 
     try:
-
         con = connect()
         cur = con.cursor()
 
-        cur.execute("INSERT INTO account (username) VALUES (uname);")
+        cur.execute("INSERT INTO account (username) VALUES ('" + uname + "');")
         uid = find_user(uname)
-        cur.execute("INSERT INTO super_portfolio (account_id, name, initial_cash) VALUES(" + uid + "'" + uname + "', " + 100000 + "');")
+        cur.execute("INSERT INTO super_portfolio (account_id, name, initial_cash) VALUES(" + uid + ", '" + uname + "', 100000);")
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -129,19 +126,12 @@ def top_5():
         con = connect()
         cur = con.cursor()
 
-#        cmd = cur.execute("""SELECT * FROM account;""")
-#        accounts = cmd.fetchall()
-#        for acnt in accounts:
-
         cur.execute("""SELECT * FROM account;""")
 
         sums = [[0, ""] for x in range(cur.rowcount)]
-#        print(("cur.rowcount: "))
-#        print ((cur.rowcount))
 
         for n in range(cur.rowcount):
             row = cur.fetchone()
-#            print(('row[', n, '] = ', row))
 
             vals = str(row).split("L, '")
             vals[0] = (vals[0])[1:]
