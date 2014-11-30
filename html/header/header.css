@@ -4,6 +4,7 @@
 
 #header {
 	display: inline-block;
+	background: rgba(222, 184, 135, 0.9);	/* burlywood */
 	
 	height: 100%;
 	width: 100%;
