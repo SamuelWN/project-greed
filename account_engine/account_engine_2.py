@@ -28,11 +28,13 @@ def main():
 # http://stackoverflow.com/questions/1540365/why-isnt-getopt-working-if-sys-argv-is-passed-fully
 # I changed sys.argv to sys.argv[1:], so that getopt would work as intended
 
-    opt = sys.argv[1:][0]
+    if(sys.argv[1:]):
+        if (sys.argv[1:][0] in ['-a', '-f', 't', '-A']):
+            opt = sys.argv[1:][0]
+    else:
+        opt = '-h'
 
-    if opt == '-h':
-        print()
-    elif opt == '-a':
+    if opt == '-a':
         add_user(sys.argv[1:][1])
     elif opt == '-f':
         find_user(sys.argv[1:][1])
@@ -40,7 +42,11 @@ def main():
         top_5()
     elif opt == '-A':
         all()
-
+    elif opt == '-h':
+        print("""-a USERNAME           Add user USERNAME to databas""")
+        print("""-f USERNAME           Find user USERNAME in the databse""")
+        print("""-t                    Show the top 5 user (determined by net worth)""")
+        print("""-A                    Show all user within the database""")
 
 def add_user(uname):
     print(("add_user"))
@@ -71,11 +77,15 @@ def add_user(uname):
 
 
 def find_user(uname):
+    userid = -1
+
     try:
         con = connect()
         cur = con.cursor()
 
-        cur.execute("SELECT id FROM greed.account WHERE username = '" + uname + "';")
+        statement = """SELECT id FROM greed.account
+                    WHERE username = '%s';""" % (uname)
+        cur.execute(statement)
 
         uid = cur.fetchone()
         uid = str(uid).split('L')[0]
@@ -148,9 +158,12 @@ def top_5():
 #        portforlio_value_stock + portfolio_value_cash                         #
 ################################################################################
 
-            statement = """SUM(SELECT * FROM portfolio_value_cash
-                            WHERE owner_account_id = '%i');""" % (uid)
+            statement = """SELECT * FROM portfolio_value_cash
+                                    WHERE id = '%i';""" % (uid)
             sums[n][0] = cur.execute(statement)
+            statement = """SELECT 8 FROM portfolio_value_stoc
+                                    WHERE id = '%i';""" % (uid)
+            sums[n][0] += cur.execute(statement)
 
 #TESTING:
             print(("Username:"))
@@ -198,16 +211,6 @@ def top_5():
         #  for row in ret]))
 '''
         return ret
-
-
-
-
-
-
-
-
-
-
 
 # python is interpreted - it needs to actually be told to run your "main" method
 
