@@ -1,11 +1,5 @@
 #!/usr/bin/python
 
-################################################################################
-#  Current status:                                                             #
-#    I can't seem to find any glaring errors, but results aren't being	       #
-#    displayed to the console                                                  #
-################################################################################
-
 import MySQLdb as mdb
 import sys
 
@@ -17,9 +11,6 @@ import sys
 import pdb
 
 
-num_users = 0
-
-
 def connect():
     return mdb.connect(host="localhost", user="root", passwd="toor", db="greed")
 
@@ -29,7 +20,7 @@ def main():
 # I changed sys.argv to sys.argv[1:], so that getopt would work as intended
 
     if(sys.argv[1:]):
-        if (sys.argv[1:][0] in ['-a', '-f', 't', '-A']):
+        if (sys.argv[1:][0] in ['-a', '-f', '-t', '-A']):
             opt = sys.argv[1:][0]
     else:
         opt = '-h'
@@ -46,7 +37,8 @@ def main():
         print("""-a USERNAME           Add user USERNAME to databas""")
         print("""-f USERNAME           Find user USERNAME in the databse""")
         print("""-t                    Show the top 5 user (determined by net worth)""")
-        print("""-A                    Show all user within the database""")
+        print("""-A                    Show all user within the database (debugging)""")
+
 
 def add_user(uname):
     print(("add_user"))
@@ -158,12 +150,9 @@ def top_5():
 #        portforlio_value_stock + portfolio_value_cash                         #
 ################################################################################
 
-            statement = """SELECT * FROM portfolio_value_cash
+            statement = """SELECT * FROM portfolio_value_total
                                     WHERE id = '%i';""" % (uid)
             sums[n][0] = cur.execute(statement)
-            statement = """SELECT 8 FROM portfolio_value_stoc
-                                    WHERE id = '%i';""" % (uid)
-            sums[n][0] += cur.execute(statement)
 
 #TESTING:
             print(("Username:"))
