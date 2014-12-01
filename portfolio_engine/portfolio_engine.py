@@ -19,28 +19,28 @@ def main():
 
     opt = ''
 
-    if((sys.argv[1:]) and (sys.argv[1:][0] in ['-np', '-ncp', '-b', '-s', '-fsup'])):
-            opt = sys.argv[1:][0]
+    if((sys.argv[1:]) and (sys.argv[1:][0] in ['-np', '-ncp', '-b', '-s', '-f'])):
+        opt = sys.argv[1:][0]
     else:
         opt = '-h'
 
     if opt == '-np':
-        new_portfolio(sys.argv[1:][1])
+        new_portfolio(int(sys.argv[1:][1]))
     elif opt == '-ncp':
         new_comp_portfolio(sys.argv[1:][1], sys.argv[1:][2])
     elif opt == '-b':
         buy_stock(sys.argv[1:][1], sys.argv[1:][2], sys.argv[1:][3])
     elif opt == '-s':
         sell_stock(sys.argv[1:][1], sys.argv[1:][2], sys.argv[1:][3])
-    elif opt == '-fsup':
+    elif opt == '-f':
         find_super_portfolio(sys.argv[1:][1])
     elif opt == '-h':
         print("""-np PID                      Create portfolio for super_portfolio PID""")
-        print("""-ncp PIDCOMPETITION_ID      Create competition portfolio for super_portfolio PID""")
+        print("""-ncp PID COMPETITION_ID      Create competition portfolio for super_portfolio PID""")
         print("""-b PID STOCK_ID #STOCKS      Buy #STOCKS number of stock STOCK_ID for super_portfolio PID""")
         print("""-s PID STOCK_ID #STOCKS      Sell #STOCKS number of stock STOCK_ID for super_portfolio PID""")
-        print()
-        print("""-fsup PORTFOLIO_NAME             Get id of super_portfolio PORTFOLIO_NAME (DEBUGGING)""")
+        print
+        print("""-f PORTFOLIO_NAME             Get id of super_portfolio PORTFOLIO_NAME (DEBUGGING)""")
 
 
 def new_portfolio(pid):
@@ -52,7 +52,7 @@ def new_portfolio(pid):
 
 #sub_portfolio lacks "portfolio_name" field
         statement = """INSERT INTO sub_portfolio
-                    (super_portfolio_id) VALUE (%i)""", (pid)
+                    (super_portfolio_id) VALUE (%i)""" % (pid)
         cur.execute(statement)
 
     except mdb.Error as e:
@@ -63,26 +63,6 @@ def new_portfolio(pid):
         if con:
             con.commit()
             con.close()
-
-    try:
-        con = connect()
-        cur = con.cursor()
-
-        statement = """INSERT INTO sub_portfolio
-                    (account_id, name, initial_cash)
-                    VALUES('%i', '%s', 100000);""" % (uid, pname)
-        cur.execute(statement)
-
-    except mdb.Error as e:
-        print(("Error %d: %s" % (e.args[0], e.args[1])))
-        sys.exit(1)
-
-    finally:
-        if con:
-            con.commit()
-            con.close()
-
-        return find_super_portfolio(pname)
 
 
 def new_comp_portfolio(pid, compid):
@@ -98,7 +78,7 @@ def new_comp_portfolio(pid, compid):
         cash = float(tuple_to_str(cur.fetchone()))
 
         stmt = """SELECT entryfee FROM competition
-            WHERE id = %i;'""" % compid
+            WHERE id = %i;'""" % (compid)
         cur.execute(stmt)
         fee = float(tuple_to_str(cur.fetchone()))
 
@@ -108,7 +88,7 @@ def new_comp_portfolio(pid, compid):
 
         stmt = """INSERT INTO sub_portfolio
                     (super_portfolio_id, competition_id)
-                    VALUE (%i, %i);""", (pid, compid)
+                    VALUE (%i, %i);""" % (pid, compid)
         cur.execute(stmt)
 
     except mdb.Error as e:
