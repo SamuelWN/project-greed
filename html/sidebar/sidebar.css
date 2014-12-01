@@ -2,14 +2,10 @@
 
 #sidebar {
 	padding: 2px;
-	 
-	background: rgba(222, 184, 135, 0.6);	/* burlywood */
 	
 	/* max-width: 250px; */
 	max-width: 175px;
 	min-width: 50px;
 	width: 15%;
 	/* overflow: hidden; */
-	
-	border-radius: 4px;
 }

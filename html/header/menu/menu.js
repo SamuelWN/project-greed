@@ -53,12 +53,6 @@ Element.prototype.build_portfolio = function (portfolioCurrent, portfolioList) {
 }
 
 
-
-
-
-
-
-
 Element.prototype.build_whatif = function() {
 	var a = document.createElement("a");
 	var textNode = document.createTextNode("What If..?");
@@ -66,13 +60,6 @@ Element.prototype.build_whatif = function() {
 	a.setAttribute("href", "#");
 	this.appendChild(a);
 }
-
-
-
-
-
-
-
 
 
 document.getElementById("menu_portfolio").build_portfolio(currentPortfolio, myPortfolios);

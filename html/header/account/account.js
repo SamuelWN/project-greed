@@ -7,8 +7,6 @@ function Account(id, username) {
 var myAccount = new Account(1, "myura");
 
 
-
-
 Element.prototype.modify_account_first = function(account) {
 	var a_first = this.firstElementChild;
 	a_first.innerHTML = account.username;

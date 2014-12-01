@@ -1,4 +1,3 @@
 <div id="content">
-	[content]
-	<br><br><br>
+	<!--#include virtual="portfolio/portfolio.shtml"-->
 </div>

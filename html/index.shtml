@@ -3,6 +3,7 @@
 	<head>
 		<title>G.R.E.E.D.</title>
 		<link rel="stylesheet" type="text/css" href="index.css">
+		<script src="chart.min.js"></script>
 		<script src="index.js"></script>
 		<script>
 		</script>

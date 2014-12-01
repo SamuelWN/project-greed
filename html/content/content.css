@@ -1,5 +1,35 @@
+@import url("portfolio/portfolio.css");
+
 #content {
-	background: cyan;
-	
-	
+}
+
+#content .title {
+	font-size: xx-large;
+	font-weight: bold;
+}
+
+#content table {
+	border-collapse:collapse;
+}
+
+#content tr {
+}
+#content tr:nth-child(even) {
+	background: white;
+}
+#content tr:nth-child(odd) {
+	background: rgb(239,220,195);
+}
+
+#content  th, td {
+	/*border: 1px solid black; */
+}
+#content th {
+	background: darkgreen;
+	color: white;
+	font-size: large;
+}
+
+#content button {
+	font-weight: bold;
 }
