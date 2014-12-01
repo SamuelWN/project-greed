@@ -1,9 +1,26 @@
-function Portfolio(name, valueTotal, valueCash, valueStock, valueComp) {
+//include("chartjs/Chart.js");
+
+var chartOptions = {
+	animation: false,
+	
+	segmentShowStroke : true,
+	segmentStrokeColor : "black",
+	segmentStrokeWidth : 2,
+	
+	showTooltips: true,
+	tooltipTemplate: "<%if (label){%><%=label%>: $<%}%><%= value %>",
+};
+
+
+
+function Portfolio(name, valueCash, valueStock, valueComp, compAnte) {
 	this.name = name;
-	this.valueTotal = valueTotal;
 	this.valueCash = valueCash;
 	this.valueStock = valueStock;
 	this.valueComp = valueComp;
+	this.compAnte = typeof compAnte !== 'undefined' ? compAnte : undefined;
+	
+	this.valueTotal = this.valueCash + this.valueStock + this.valueComp;
 }
 
 function PortfolioStock(company, symbol, valueTotal, value, count) {
@@ -17,7 +34,7 @@ function PortfolioStock(company, symbol, valueTotal, value, count) {
 
 
 // TODO: make this apply to actual portfolios
-var myPortfolio = new Portfolio("Portfolio1", 15000, 5000, 7500, 2500);
+var myPortfolio = new Portfolio("Portfolio1", 5000, 7500, 0);
 
 // TODO: make this apply to actual portfolio stocks
 var portfolioStocks = [
@@ -179,6 +196,37 @@ function portfolioTitle_span(portfolio) {
 }
 
 
+//name, valueCash, valueStock, valueComp
+function portfolioSummary_chartjs(portfolio) {
+	var canvas = document.createElement("canvas");
+	var ctx = canvas.getContext("2d");
+	var data = [
+		{
+			value: portfolio.valueCash,
+			color:"limegreen",
+			highlight: "lime",
+			label: "Cash"
+		},
+		{
+			value: portfolio.valueStock,
+			color: "darkorange",
+			highlight: "orange",
+			label: "Stock"
+		},
+		{
+			value: portfolio.valueComp,
+			color: "slateblue",
+			highlight: "mediumslateblue",
+			label: "Competition"
+		}
+	];
+	
+	var myPieChart = new Chart(ctx).Pie(data, chartOptions);
+	
+	return canvas;
+}
+
+
 
 //name, valueTotal, valueCash, valueStock, valueComp
 function portfolioSummary_dl(portfolio) {
@@ -216,6 +264,8 @@ function portfolioSummary_dl(portfolio) {
 	dl.appendChild(dd_stock);
 	dl.appendChild(dt_comp);
 	dl.appendChild(dd_comp);
+	
+	dl.appendChild(portfolioSummary_chartjs(portfolio));
 	
 	return dl;
 }

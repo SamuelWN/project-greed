@@ -19,3 +19,4 @@ function include_jquery() {
 include("header/header.js");
 include("sidebar/sidebar.js");
 include("content/content.js");
+include("footer/footer.js");

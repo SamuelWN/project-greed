@@ -15,7 +15,6 @@ html {
 	
 	height: 95%;
 	width: 90%;
-	
 	min-width: 800px;
 	
 	margin: auto;
@@ -56,12 +55,10 @@ button, input[type="button"], input[type="submit"] {
 	background-color: green;
 	
 	color: white;
-
 	
 	border: 1px solid;
 	border-color: gray;
 	outline: none;
-	
 	
 	border-radius: 2px;
 }
