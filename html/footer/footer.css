@@ -1,9 +1,7 @@
 #footer {
-	background: magenta;
 	text-align: center;
-	
+	color: lightgray;
 	margin: auto;
 	
 	width: 60%;
-	/* margin: 10px; */
 }
