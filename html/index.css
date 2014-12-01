@@ -48,3 +48,33 @@ html {
 .dollars:before {
 	content: "$";
 }
+
+
+button, input[type="button"], input[type="submit"] {
+	background-image: linear-gradient(green, darkgreen);
+	background-repeat: no-repeat;
+	background-color: green;
+	
+	color: white;
+
+	
+	border: 1px solid;
+	border-color: gray;
+	outline: none;
+	
+	
+	border-radius: 2px;
+}
+
+
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+	border-color: dimgray;
+}
+
+
+button:active, input[type="button"]:active, input[type="submit"]:active {
+	background-image: linear-gradient(darkgreen, green);
+	background-color: darkgreen;
+	
+	border-color: gray;
+}
