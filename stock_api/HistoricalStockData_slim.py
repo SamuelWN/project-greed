@@ -1,5 +1,6 @@
 import urllib2
 import time
+import csv
 import pdb
 
 
@@ -26,4 +27,20 @@ if __name__ == "__main__":
         (i.e. Jan = 0, Feb = 1 ... Nov = 10, Dec = 11) '''
     #             SYMBL,  YEAR, M, D,  YEAR, M, D
     quote = c.get("MSFT", 2000, 2, 15, 2010, 0, 31)
-    print quote
+
+    quotes = quote.splitlines()
+
+    import re as regex
+
+    quotelist = regex.findall('[0-9]{4}-[0|1][0-9]-[0-3][0-9],[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2}', quote)
+    #print quotelist
+
+    retlist = []
+
+    for aquote in quotelist:
+        val = aquote.split(",")
+        #print "val[0] = ", val[0]
+        #print "val[3] = ", val[3]
+        retlist.append((val[0], val[3]))
+
+    print retlist
