@@ -39,8 +39,6 @@ if __name__ == "__main__":
 
     for aquote in quotelist:
         val = aquote.split(",")
-        #print "val[0] = ", val[0]
-        #print "val[3] = ", val[3]
-        retlist.append((val[0], val[3]))
+        retlist.append((val[0], float(val[3])))
 
     print retlist
