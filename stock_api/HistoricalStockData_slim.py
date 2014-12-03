@@ -35,10 +35,10 @@ if __name__ == "__main__":
     quotelist = regex.findall('[0-9]{4}-[0|1][0-9]-[0-3][0-9],[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2}', quote)
     #print quotelist
 
-    retlist = []
+    retcsv = ""
 
-    for aquote in quotelist:
-        val = aquote.split(",")
-        retlist.append((val[0], float(val[3])))
+    for dayprice in quotelist:
+        val = dayprice.split(",")
+        retcsv += val[0] + "," + val[3] + "\n"
 
-    print retlist
+    print retcsv
