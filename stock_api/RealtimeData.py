@@ -1,15 +1,16 @@
 import urllib2
-import time
 
 class RealtimeData:
     def __init__(self):
         self.prefix = "http://finance.yahoo.com/d/quotes.csv?s="
 
     def get(self):
-        for filenum in ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"]:
+        i = 1
+
+        while i < 16:
             url = self.prefix
 
-            s = open("./stocklists/stock" + filenum, "r")
+            s = open("./stocklists/stock" + str(i), "r")
             for stock in s.readlines():
                 url += str(stock).strip() + '+'
 
@@ -30,9 +31,9 @@ class RealtimeData:
 
                     retlist += ','
 
-            time.sleep(5)
-
             print retlist[:-1]
+
+            i = i + 1
         return
 
 
