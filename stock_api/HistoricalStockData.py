@@ -1,6 +1,6 @@
 import urllib2
-import time
-import pdb
+import sys
+#import pdb
 
 
 class HistoricalData:
@@ -21,9 +21,53 @@ class HistoricalData:
 if __name__ == "__main__":
     c = HistoricalData()
 
-    '''NOTE:
-        Month value = Month-1
-        (i.e. Jan = 0, Feb = 1 ... Nov = 10, Dec = 11) '''
-    #             SYMBL,  YEAR, M, D,  YEAR, M, D
-    quote = c.get("MSFT", 2000, 2, 15, 2010, 0, 31)
-    print quote
+    if(len(sys.argv[1:]) == 7):
+        symbl = sys.argv[1:][0]
+        syear = int(sys.argv[1:][1])
+        smon = int(sys.argv[1:][2])
+        sday = int(sys.argv[1:][3])
+        eyear = int(sys.argv[1:][4])
+        emon = int(sys.argv[1:][5])
+        eday = int(sys.argv[1:][6])
+    else:
+        if(len(sys.argv[1:]) < 7):
+            print "\nNot Enough Arguments!!!"
+        else:
+            print "\nToo Many Arguments!!!"
+        print """
+Syntax:
+    HistoricalStockData.py SYMBL SYEAR SMON SDAY EYEAR EMON EDAY
+Symbol Meaning:
+    SYMBL             Stock ticker symbol
+    SYEAR             Year at which to begin getting stock data
+    SMON              Month at which to begin getting stock data
+    SDAY              Day at which to begin getting stock data
+    EYEAR             Year at which to stop getting stock data
+    EMON              Month at which to stop getting stock data
+    EDAY              Day at which to stop getting stock data
+
+
+!!!NOTE!!!
+For SMON & EMON:
+    Value = Month# - 1
+    (i.e. Jan = 0, Feb = 1 ... Nov = 10, Dec = 11)
+    """
+
+        sys.exit(1)
+
+    quote = c.get(symbl, syear, smon, sday, eyear, emon, eday)
+
+    quotes = quote.splitlines()
+
+    import re as regex
+
+    quotelist = regex.findall('[0-9]{4}-[0|1][0-9]-[0-3][0-9],[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2}', quote)
+    #print quotelist
+
+    retcsv = ""
+
+    for dayprice in quotelist:
+        val = dayprice.split(",")
+        retcsv += val[0] + "," + val[3] + "\n"
+
+    print retcsv
