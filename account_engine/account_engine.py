@@ -2,6 +2,7 @@
 
 import MySQLdb as mdb
 import sys
+import numpy as np
 
 import pdb
 
@@ -28,10 +29,10 @@ def main():
     elif opt == '-A':
         all()
     elif opt == '-h':
-        print("""-a USERNAME           Add user USERNAME to database""")
-        print("""-f USERNAME           Find user USERNAME in the databse""")
-        print("""-t                    Show the top 5 user (determined by net worth)""")
-        print("""-A                    Show all user within the database (debugging)""")
+        print("-a USERNAME           Add user USERNAME to database")
+        print("-f USERNAME           Find user USERNAME in the databse")
+        print("-t                    Show the top 5 user (determined by net worth)")
+        print("-A                    Show all user within the database (debugging)")
 
 
 def add_user(uname):
@@ -124,60 +125,45 @@ def all():
 
 
 def top_5():
-    ret = [[0.00, ""], [0.00, ""], [0.00, ""], [0.00, ""], [0.00, ""]]
+    ret = [''][0]
     try:
         con = connect()
-        cur = con.cursor()
+        con2 = connect()
+        usr = con.cursor()
+        val = con2.cursor()
 
-        cur.execute("""SELECT * FROM account;""")
+        stmt = "SELECT total_value FROM greed.portfolio_value_total WHERE id = "
 
-        sums = [[0, ""] for x in range(cur.rowcount)]
+        val.execute("SELECT COUNT(*) FROM greed.account")
+        numusers = int(tuple_to_str(val.fetchone()))
 
-        for n in range(cur.rowcount):
-            row = cur.fetchone()
+        usr.execute("SELECT id FROM account;")
 
-            vals = str(row).split("L, '")
-            vals[0] = (vals[0])[1:]
-            uid = int(vals[0])
-            sums[n][1] = str(vals[1]).split("')")[0]
+        sums = [[0, 0] for x in range(numusers)]
 
-#TESTING:
-            print(("ID:"))
-            print((sums[n][0]))
-            print(("Username:"))
-            print((sums[n][1]))
+        ret = [["", 0.00] for x in range(5 if (numusers >= 5) else numusers)]
 
-################################################################################
-#    NEED TO CHANGE STATEMENT TO USE:                                          #
-#        portforlio_value_stock + portfolio_value_cash                         #
-################################################################################
+        i = 0
+        while i < numusers:
+            sums[i][0] = int(tuple_to_str(usr.fetchone()))
+            val.execute(stmt + str(sums[i][0]) + ";")
+            sums[i][1] = float(str(val.fetchone()).split("'")[1])
 
-            statement = """SELECT * FROM portfolio_value_total
-                                    WHERE id = '%i';""" % (uid)
-            sums[n][0] = cur.execute(statement)
+            i = i + 1
 
-#TESTING:
-            print(("Username:"))
-            print((sums[n][1]))
-            print(("Cash:"))
-            print((sums[n][0]))
-
-        import numpy as np
-
-        sums = np.array(sums)
+        sums = np.matrix(sums)
         sums.sort(axis=1, kind='mergesort')
-        ordered_sums = reversed(sums)
+        ordered_sums = sums[::-1].tolist()
 
-        ret[0][0] = ordered_sums[0][0]
-        ret[0][1] = ordered_sums[0][0]
-        ret[1][0] = ordered_sums[1][0]
-        ret[1][1] = ordered_sums[1][1]
-        ret[2][0] = ordered_sums[2][0]
-        ret[2][1] = ordered_sums[2][1]
-        ret[3][0] = ordered_sums[3][0]
-        ret[3][1] = ordered_sums[3][1]
-        ret[4][0] = ordered_sums[4][0]
-        ret[4][1] = ordered_sums[4][1]
+        stmt = "SELECT username FROM greed.account WHERE id = "
+
+        i = 0
+        while i < (5 if (numusers >= 5) else numusers):
+            usr.execute(stmt + str(int(ordered_sums[i][0])) + ";")
+            ret[i][0] = str(usr.fetchone()).split("'")[1]
+            ret[i][1] = ordered_sums[i][1]
+
+            i = i + 1
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -189,18 +175,13 @@ def top_5():
             con.close()
 
 # Testing:
-        '''for a_ret in ret:
-            for val in a_ret:
-                print (val)
-            print(("\n"))
+        i = 0
+        while i < (5 if (numusers >= 5) else numusers):
+            print "ret[", i, "][0] = ", ret[i][0]
+            print "ret[", i, "][1] = ", ret[i][1]
+            print
+            i = i + 1
 
-#            print(a_ret[0])
- #           print(("    $")
-  #          print(a_ret[1])
-   #         print(("\n"))
-        #print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-        #  for row in ret]))
-'''
         return ret
 
 
