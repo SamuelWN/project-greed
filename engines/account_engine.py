@@ -3,12 +3,12 @@
 import MySQLdb as mdb
 import sys
 import numpy as np
-
-import pdb
+#import pdb
 
 
 def connect():
     return mdb.connect(host="localhost", user="root", passwd="toor", db="greed")
+
 
 def tuple_to_str(ret):
         return (str(ret).split('L')[0])[1:]
@@ -16,7 +16,7 @@ def tuple_to_str(ret):
 
 def main():
     if((sys.argv[1:]) and (sys.argv[1:][0] in ['-a', '-f', '-t', '-A'])):
-            opt = sys.argv[1:][0]
+        opt = sys.argv[1:][0]
     else:
         opt = '-h'
 
@@ -31,13 +31,11 @@ def main():
     elif opt == '-h':
         print("-a USERNAME           Add user USERNAME to database")
         print("-f USERNAME           Find user USERNAME in the databse")
-        print("-t                    Show the top 5 user (determined by net worth)")
-        print("-A                    Show all user within the database (debugging)")
+        print("-t                    Show the top 5 user (by net worth)")
+        print("-A                    Show all user within the database")
 
 
 def add_user(uname):
-    print(("add_user"))
-
     try:
         con = connect()
         cur = con.cursor()
@@ -48,7 +46,7 @@ def add_user(uname):
                     WHERE username = '%s';""" % (uname)
         cur.execute(statement)
 
-        uid = int(tuple_to_str(cur.fetchone()))
+        uid = int(cur.fetchone()[0])
 
         statement = """INSERT INTO super_portfolio
                     (account_id, name, initial_cash)
@@ -64,12 +62,9 @@ def add_user(uname):
             con.commit()
             con.close()
 
-# Testing:
-        print()
-
 
 def find_user(uname):
-    userid = -1
+    uid = -1
 
     try:
         con = connect()
@@ -79,12 +74,8 @@ def find_user(uname):
                     WHERE username = '%s';""" % (uname)
         cur.execute(statement)
 
-        uid = cur.fetchone()
-        print "uid = cur.fetchone()     =    ", uid
-        print "uid = tuple_to_str(uid)    =    ", tuple_to_str(uid)
-        uid = str(uid).split('L')[0]
-
-        userid = int((uid)[1:])
+        uid = cur.fetchone()[0]
+        #print "uid = cur.fetchone()[0]     =    ", uid
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -96,19 +87,18 @@ def find_user(uname):
             con.close()
 
 # Testing:
-        print userid
+        print uid
 
-        return int(tuple_to_str(userid))
+        return uid
 
 
 # Testing:
 def all():
     try:
-        print(("\nall()\n"))
         con = connect()
         cur = con.cursor()
 
-        cur.execute("""SELECT * FROM account;""")
+        cur.execute("SELECT * FROM account;")
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -135,7 +125,7 @@ def top_5():
         stmt = "SELECT total_value FROM greed.portfolio_value_total WHERE id = "
 
         val.execute("SELECT COUNT(*) FROM greed.account")
-        numusers = int(tuple_to_str(val.fetchone()))
+        numusers = val.fetchone()[0]
 
         usr.execute("SELECT id FROM account;")
 
@@ -145,7 +135,7 @@ def top_5():
 
         i = 0
         while i < numusers:
-            sums[i][0] = int(tuple_to_str(usr.fetchone()))
+            sums[i][0] = int(usr.fetchone()[0])
             val.execute(stmt + str(sums[i][0]) + ";")
             sums[i][1] = float(str(val.fetchone()).split("'")[1])
 
@@ -177,9 +167,7 @@ def top_5():
 # Testing:
         i = 0
         while i < (5 if (numusers >= 5) else numusers):
-            print "ret[", i, "][0] = ", ret[i][0]
-            print "ret[", i, "][1] = ", ret[i][1]
-            print
+            print ret[i][0] + "," + str(ret[i][1])
             i = i + 1
 
         return ret
