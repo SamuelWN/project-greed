@@ -3,6 +3,7 @@
 import urllib2
 import sys
 #import pdb
+import re as regex
 
 
 class HistoricalData:
@@ -25,10 +26,6 @@ def main(symbl, syear, smon, sday, eyear, emon, eday):
 
     quote = c.get(symbl, syear, smon, sday, eyear, emon, eday)
 
-    #quotes = quote.splitlines()
-
-    import re as regex
-
     quotelist = regex.findall('[0-9]{4}-[0|1][0-9]-[0-3][0-9],[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2}', quote)
 
     retcsv = ""
@@ -44,36 +41,37 @@ if __name__ == "__main__":
     if(len(sys.argv[1:]) == 7):
         symbl = sys.argv[1:][0]
         syear = int(sys.argv[1:][1])
-        smon = int(sys.argv[1:][2])
+        smon = int(sys.argv[1:][2]) - 1
         sday = int(sys.argv[1:][3])
         eyear = int(sys.argv[1:][4])
-        emon = int(sys.argv[1:][5])
+        emon = int(sys.argv[1:][5]) - 1
         eday = int(sys.argv[1:][6])
 
         print main(symbl, syear, smon, sday, eyear, emon, eday)
         sys.exit(1)
 
-    if(len(sys.argv[1:]) < 7):
-        print "\nNot Enough Arguments!!!"
-    else:
-        print "\nToo Many Arguments!!!"
+    elif(len(sys.argv[1:]) == 4):
+        symbl = sys.argv[1:][0]
+        year = int(sys.argv[1:][1])
+        mon = int(sys.argv[1:][2]) - 1
+        day = int(sys.argv[1:][3])
 
-    print """
-Syntax:
-    HistoricalStockData.py SYMBL SYEAR SMON SDAY EYEAR EMON EDAY
+        print main(symbl, year, mon, day, year, mon, day)
+    else:
+        print """Syntax:
+    To query a specific date:
+        HistoricalStockData.py SYMBL YEAR MONTH DAY
+
+    To query a range:
+        HistoricalStockData.py SYMBL SYEAR SMONTH SDAY EYEAR EMONTH EDAY
+
 Symbol Meaning:
     SYMBL             Stock ticker symbol
     SYEAR             Year at which to begin getting stock data
-    SMON              Month at which to begin getting stock data
+    SMONTH              Month at which to begin getting stock data
     SDAY              Day at which to begin getting stock data
     EYEAR             Year at which to stop getting stock data
-    EMON              Month at which to stop getting stock data
+    EMONTH              Month at which to stop getting stock data
     EDAY              Day at which to stop getting stock data
-
-
-!!!NOTE!!!
-For SMON & EMON:
-    Value = Month# - 1
-    (i.e. Jan = 0, Feb = 1 ... Nov = 10, Dec = 11)
-    """
+"""
     sys.exit(1)
