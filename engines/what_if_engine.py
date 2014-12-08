@@ -13,64 +13,59 @@ def connect():
 
 
 def main():
-    if((sys.argv[1:]) and (sys.argv[1:][0]
-    in ['-a', '-f'])):
-        opt = sys.argv[1:][0]
+    pid = int(sys.argv[1:][1])
+    symbl = sys.argv[1:][2]
+    syear = int(sys.argv[1:][3])
+    smon = int(sys.argv[1:][4])
+    sday = int(sys.argv[1:][5])
+
+    if(len(sys.argv) == 8):
+        eyear = int(sys.argv[1:][6])
+        emon = int(sys.argv[1:][7])
+        eday = int(sys.argv[1:][8])
+    elif (len(sys.argv) == 5):
+        eyear = emon = eday = None
     else:
-        opt = '-h'
+        print "Improper Input"
+        sys.exit(0)
 
-    if opt == '-a':
-        print create_new(int(sys.argv[1:][1]), sys.argv[1:][2],
-                int(sys.argv[1:][1]), int(sys.argv[1:][1]),
-                int(sys.argv[1:][1]), int(sys.argv[1:][1]),
-                int(sys.argv[1:][1]), int(sys.argv[1:][1]))
+    print create_new(pid, symbl, syear, smon, sday, eyear, emon, eday)
 
-
-def stock_sum(stocks):
-    ret_sum = 0
-
-    for val in stocks:
-        ret_sum = ret_sum + int(val[1])
-
-    return ret_sum
 
 def create_new(pid, symbl, syear, smon, sday, eyear, emon, eday):
-    val_sum = 0
-
     try:
         con = connect()
         cur = con.cursor()
 
-        stmt = """SELECT unixtime, type
-                FROM greed.transaction
-                WHERE stock_symbol = """ + symbl + """
-                ORDER BY unixtime DESC;"""
+        stmt = """SELECT value_stock, value_cash, value_total
+                FROM greed.portfolio_value_total
+                WHERE id = %i;""" % (pid)
 
         cur.execute(stmt)
-        preowned = cur.fetchall()
+        folio = cur.fetchone()
+        pstocks = folio[0]
+        pcash = folio[1]
+        ptotal = folio[2]
 
+        buy = HistoricalStockData.main(symbl, syear, smon, sday).split(',')[1]
 
-        smon += 1
-        emon += 1
+        if ((eyear is not None) and (emon is not None) and (eday is not None)):
+            sell = HistoricalStockData.main(symbl, eyear, emon, eday).split(',')[1]
 
-        startstr = str(smon) + "/" + str(sday) + "/" + str(syear)
-        endstr = str(emon) + "/" + str(eday) + "/" + str(eyear)
+            valsale = float(sell) - float(buy)
+            pcash = pcash + valsale
+            ptotal = ptotal + valsale
 
-        utcstart = time.mktime(datetime.datetime.strptime(startstr).timetuple())
-        utcend = time.mktime(datetime.datetime.strptime(endstr).timetuple())
-
-        if(preowned is not None):
-            for trans in preowned:
-                if(trans[0] < utcend):
-                    if(trans[1] == 's'):
-                        fetch = time.strftime("%D", time.unixtime(trans[0])).split("/")
-
-                        todate = HistoricalStockData.main(symbl, int(fetch[2]), int(fetch[1]) - 1, fetch[0], eyear, emon, eday)
-
-                        val_sum = val_sum + float(todate[-1][1]) - float(todate[0][1])
         else:
-            stocklist = HistoricalStockData.main(symbl, syear, smon, sday, eyear,emon, eday)
-            val_sum = val_sum + float(stocklist[-1][1]) - float(stocklist[0][1])
+            stmt = """SELECT value
+                      FROM greed.stock_current
+                      WHERE stock_symbol = '%s';""" % (symbl)
+
+            cur.execute(stmt)
+            valstocks = float(cur.fetchone()[0])
+            pstocks = pstocks + valstocks
+
+        return str(pstocks) + ',' + str(pcash) + ',' + str(ptotal)
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
