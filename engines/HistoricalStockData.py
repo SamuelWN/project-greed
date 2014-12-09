@@ -5,6 +5,21 @@ import sys
 #import pdb
 import re as regex
 
+################################################################################
+# Stock Fetching Error:                                                        #
+#    Turns out that the errors were not due to improperly regex-ing (albeit,   #
+#    I did find some regex-errors during testing), but were instead caused by  #
+#    data not being available for certain stocks at certain times. (Error 404) #
+#                                                                              #
+# Note:                                                                        #
+#    Queries for:                                                              #
+#    GOOG    don't work for dates prior to: 2014-03-27                         #
+#    ZZ      don't work for dates after:    2013-03-18                         #
+#                                                                              #
+#    (MSFT stock seems to work properly for every query I did... so I should   #
+#    probably use a different ticker symbol for testing...)                    #
+################################################################################
+
 
 class HistoricalData:
     def __init__(self):
@@ -15,10 +30,16 @@ class HistoricalData:
         url = url + "&c=" + str(syear) + "&d=" + str(emonth) + "&e="
         url = url + str(eday) + "&f=" + str(eyear) + "&g=d"
 
-        u = urllib2.urlopen(url)
-        content = u.read()
+        print "url:\n %s \n" % (url)
 
-        return content
+        try:
+            u = urllib2.urlopen(url)
+            content = u.read()
+        except urllib2.HTTPError as e:
+            print "Error " + str(e.code)
+            content = None
+        finally:
+            return content
 
 
 def main(symbl, syear, smon, sday, eyear, emon, eday):
@@ -26,7 +47,10 @@ def main(symbl, syear, smon, sday, eyear, emon, eday):
 
     quote = c.get(symbl, syear, smon, sday, eyear, emon, eday)
 
-    quotelist = regex.findall('[0-9]{4}-[0|1][0-9]-[0-3][0-9],[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2},[0-9]{2}.[0-9]{2}', quote)
+    if (quote is None):
+        sys.exit(1)
+
+    quotelist = regex.findall('[0-9]{4}-[0|1][0-9]-[0-3][0-9],[0-9]+.[0-9]{2},[0-9]+.[0-9]{2},[0-9]+.[0-9]{2}', quote)
 
     retcsv = ""
 
