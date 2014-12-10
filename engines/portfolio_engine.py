@@ -3,7 +3,8 @@
 import MySQLdb as mdb
 import sys
 import time
-#import pdb
+#from datetime import datetime
+import pdb
 
 
 def connect():
@@ -14,7 +15,8 @@ def tuplestocsv(val_list):
     ret = ""
     for vals in val_list:
         for val in vals:
-            ret += str(val) + ','
+            if(val is not None):
+                ret += str(val) + ','
 
         ret = ret[:-1]
         ret += "\n"
@@ -23,7 +25,7 @@ def tuplestocsv(val_list):
 
 
 def main():
-    print sys.argv[1:]
+    #print sys.argv[1:]
 
     opt = ''
 
@@ -36,11 +38,11 @@ def main():
     if opt == '-np':
         new_portfolio(int(sys.argv[1:][1]))
     elif opt == '-ncp':
-        print new_comp_portfolio(sys.argv[1:][1], sys.argv[1:][2])
+        print new_comp_portfolio(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
     elif opt == '-b':
-        buy_stock(sys.argv[1:][1], sys.argv[1:][2], sys.argv[1:][3])
+        buy_stock(int(sys.argv[1:][1]), sys.argv[1:][2], int(sys.argv[1:][3]))
     elif opt == '-s':
-        sell_stock(sys.argv[1:][1], sys.argv[1:][2], sys.argv[1:][3])
+        sell_stock(int(sys.argv[1:][1]), sys.argv[1:][2], int(sys.argv[1:][3]))
     elif opt == '-fsu':
         print find_super_portfolios_uname(sys.argv[1:][1])
     elif opt == '-fs':
@@ -48,9 +50,9 @@ def main():
     elif opt == '-fc':
         print find_comp_portfolios(sys.argv[1:][1])
     elif opt == '-fstd':
-        print find_std_sub_portfolios(sys.argv[1:][1])
+        print find_std_sub_portfolios(int(sys.argv[1:][1]))
     elif opt == '-fA':
-        print find_all(sys.argv[1:][1])
+        print find_all(int(sys.argv[1:][1]))
     elif opt == '-h':
         print("""-np PID
             Create portfolio for super-portfolio PID\n""")
@@ -100,39 +102,52 @@ def new_comp_portfolio(pid, compid):
         con = connect()
         cur = con.cursor()
 
-        stmt = """SELECT * FROM gree.subportfolio
+        stmt = """SELECT EXISTS (
+            SELECT * FROM greed.sub_portfolio
             WHERE super_portfolio_id = %i
-            AND competition_id = %i;""" % (pid, compid)
-
+            AND competition_id = %i
+            );""" % (pid, compid)
         cur.execute(stmt)
+        cpid = int(cur.fetchone()[0])
 
-        if (cur.fetchone() is None):
-            stmt = """SELECT cash FROM portfolio_value_cash
+        if (cpid == 0):
+            stmt = """SELECT cash FROM greed.portfolio_value_cash
                 WHERE id = %i;""" % (pid)
             cur.execute(stmt)
             cash = float(cur.fetchone()[0])
 
-            stmt = """SELECT entryfee FROM competition
-                WHERE id = %i;'""" % (compid)
+            print "stmt = \n    " + stmt + "\n"
+            cur.execute(stmt)
+            print "stmt executed\n"
+
+            cur.close()
+            cur = con.cursor()
+
+            stmt = """SELECT entryfee FROM greed.competition
+                WHERE id = %i;""" % (compid)
             cur.execute(stmt)
             fee = float(cur.fetchone()[0])
+
+            cur.execute(stmt)
 
             if(cash < fee):
                 print "Not enough cash to enter competition"
             else:
-                stmt = """INSERT INTO sub_portfolio
+                stmt = """INSERT INTO greed.sub_portfolio
                     (super_portfolio_id, competition_id)
                     VALUE (%i, %i);""" % (pid, compid)
+
                 cur.execute(stmt)
 
-                stmt = """SELECT id FROM sub_portfolio
-                    WHERE super_portfolio_id = %i
-                    AND competition_id = %i;
-                    """ % (pid, compid)
-
+                stmt = """SELECT LAST_INSERT_ID();"""
                 cur.execute(stmt)
                 cpid = cur.fetchone()[0]
-
+        else:
+            stmt = """SELECT id FROM greed.sub_portfolio
+            WHERE super_portfolio_id = %i
+            AND competition_id = %i;""" % (pid, compid)
+            cur.execute(stmt)
+            cpid = cur.fetchone()[0]
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
         sys.exit(1)
@@ -141,6 +156,7 @@ def new_comp_portfolio(pid, compid):
         if con:
             con.commit()
             con.close()
+
         return cpid
 
 
@@ -165,9 +181,11 @@ def buy_stock(pid, stock_id, num_stocks):
             print ("Insufficient Funds")
         else:
             stmt = """INSERT INTO transaction
-                (sub_portfolio_id, unixtime, stock_symbol, stock_count, type)
-                VALUE (%i, %f, '%s', %i, 'p');
-                """ % (pid, time.gmtime(), stock_id, num_stocks)
+                (sub_portfolio_id, unixtime, stock_symbol, stock_count, stock_value, type)
+                VALUE (%i, %f, '%s', %i,
+                    (SELECT value FROM greed.stock_current
+                    WHERE stock_symbol = '%s'),
+                'p');""" % (pid, time.time(), stock_id, num_stocks, stock_id)
             cur.execute(stmt)
 
     except mdb.Error as e:
@@ -196,9 +214,11 @@ def sell_stock(pid, stock_id, num_stocks):
             print ("Cannot Sell More Stocks than are Owned")
         else:
             stmt = """INSERT INTO transaction
-                (sub_portfolio_id, unixtime, stock_symbol, stock_count, type)
-                VALUE (%i, %f, '%s', %i, 's');
-                """ % (pid, time.gmtime(), stock_id, num_stocks)
+                (sub_portfolio_id, unixtime, stock_symbol, stock_count, stock_value, type)
+                VALUE (%i, %f, '%s', %i,
+                    (SELECT value FROM greed.stock_current
+                    WHERE stock_symbol = '%s'),
+                's');""" % (pid, time.time(), stock_id, num_stocks, stock_id)
             cur.execute(stmt)
 
     except mdb.Error as e:
@@ -271,8 +291,8 @@ def find_comp_portfolios(uid):
         con = connect()
         cur = con.cursor()
 
-        stmt = """SELECT * FROM sub_portfolio
-                WHERE id  = %i AND competition_id IS NOT NULL;""" % (uid)
+        stmt = """SELECT id, competition_id FROM sub_portfolio
+                WHERE super_portfolio_id  = %i AND competition_id IS NOT NULL;""" % (uid)
         cur.execute(stmt)
         folios = cur.fetchall()
 
@@ -298,8 +318,8 @@ def find_std_sub_portfolios(uid):
         con = connect()
         cur = con.cursor()
 
-        stmt = """SELECT * FROM sub_portfolio
-                WHERE id  = %i AND competition_id IS NULL;""" % (uid)
+        stmt = """SELECT id FROM sub_portfolio
+                WHERE super_portfolio_id  = %i AND competition_id IS NULL;""" % (uid)
         cur.execute(stmt)
         folios = cur.fetchall()
 
@@ -326,7 +346,7 @@ def find_all(uid):
         cur = con.cursor()
 
         stmt = """SELECT * FROM sub_portfolio
-                WHERE id  = %i;"""
+                WHERE id  = %i;""" % (uid)
         cur.execute(stmt)
         folios = cur.fetchall()
 
