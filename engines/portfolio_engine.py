@@ -30,15 +30,23 @@ def main():
     opt = ''
 
     if((sys.argv[1:]) and (sys.argv[1:][0] in
-    ['-np', '-ncp', '-b', '-s', '-fsu', '-fs', '-fc', '-fstd', '-fA'])):
+    ['-np', '-dp', '-nsp', '-dsp', '-ncp', '-b', '-s', '-fsu', '-fs', '-fc', '-fstd', '-fA'])):
         opt = sys.argv[1:][0]
     else:
         opt = '-h'
 
     if opt == '-np':
         new_portfolio(int(sys.argv[1:][1]))
+    elif opt == '-nsp':
+        new_portfolio(int(sys.argv[1:][1]))
+    elif opt == '-dp':
+        delete_portfolio(int(sys.argv[1:][1]))
+    elif opt == '-dsp':
+        new_portfolio(int(sys.argv[1:][1]))
     elif opt == '-ncp':
         print new_comp_portfolio(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
+    elif opt == '-dcp':
+        print delete_comp_portfolio(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
     elif opt == '-b':
         buy_stock(int(sys.argv[1:][1]), sys.argv[1:][2], int(sys.argv[1:][3]))
     elif opt == '-s':
@@ -54,18 +62,22 @@ def main():
     elif opt == '-fA':
         print find_all(int(sys.argv[1:][1]))
     elif opt == '-h':
-        print("""-np PID
-            Create portfolio for super-portfolio PID\n""")
-        print("""-ncp PID COMPETITION_ID
-            Create competition portfolio for super-portfolio PID\n""")
+        print("""-np SPID
+            Create portfolio for super-portfolio SPID\n""")
+        print("""-dp SPID
+            Create portfolio for super-portfolio SPID\n""")
+        print("""-ncp SPID COMPETITION_ID
+            Create competition portfolio for super-portfolio SPID\n""")
+        print("""-dcp CPID
+            Delete competition portfolio CPID\n""")
         print("""-b PID STOCK #STOCKS
             Buy #STOCKS number of stock STOCK for sub-portfolio PID\n""")
         print("""-s PID STOCK #STOCKS
             Sell #STOCKS number of stock STOCK for sub-portfolio PID\n""")
         print("""-fsU UNAME
-            Get all super-portfolios for user by username\n""")
+            Get all super-portfolios for user by username UNAME\n""")
         print("""-fs UID
-            Get all super-portfolios for user UID\n""")
+            Get all super-portfolios for user by user id UID\n""")
         print("""-fc UID
             Get all competition portfolios for user UID\n""")
         print("""-fstd UID
@@ -74,16 +86,89 @@ def main():
             Get all sub-portfolios for user UID\n""")
 
 
-def new_portfolio(pid):
+def new_super_portfolio(uid, name, cash):
     #print "new_portfolio(", pid, ")"
 
     try:
         con = connect()
         cur = con.cursor()
 
-        statement = """INSERT INTO sub_portfolio
-                    (super_portfolio_id) VALUE (%i)""" % (pid)
+        statement = """INSERT INTO super_portfolio
+                    (account_portfolio_id, name, initial_cash)
+                    VALUE (%i, '%s', %f)
+                    """ % (uid, name, cash)
         cur.execute(statement)
+
+        stmt = "SELECT LAST_INSERT_ID();"
+        cur.execute(stmt)
+        pid = cur.fetchone()[0]
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+        return pid
+
+
+def delete_super_portfolio(spid):
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """DELETE FROM greed.sub_portfolio
+                WHERE id = %i;""" % (spid)
+        cur.execute(stmt)
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+
+def new_portfolio(spid):
+    #print "new_portfolio(", pid, ")"
+
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """INSERT INTO sub_portfolio
+                (super_portfolio_id) VALUE (%i)""" % (spid)
+        cur.execute(stmt)
+
+        stmt = "SELECT LAST_INSERT_ID();"
+        cur.execute(stmt)
+        pid = cur.fetchone()[0]
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+        return pid
+
+
+def delete_portfolio(pid):
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """DELETE FROM greed.sub_portfolio
+                WHERE id = %i;""" % (pid)
+        cur.execute(stmt)
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -96,7 +181,7 @@ def new_portfolio(pid):
 
 
 def new_comp_portfolio(pid, compid):
-    #print "new_comp_portfolio(", pid, ", ", compid, ")"
+    print "new_comp_portfolio(", pid, ", ", compid, ")"
     cpid = -1
     try:
         con = connect()
@@ -116,9 +201,7 @@ def new_comp_portfolio(pid, compid):
             cur.execute(stmt)
             cash = float(cur.fetchone()[0])
 
-            print "stmt = \n    " + stmt + "\n"
             cur.execute(stmt)
-            print "stmt executed\n"
 
             cur.close()
             cur = con.cursor()
@@ -134,9 +217,10 @@ def new_comp_portfolio(pid, compid):
                 print "Not enough cash to enter competition"
             else:
                 stmt = """INSERT INTO greed.sub_portfolio
+            cpid = portfolio_engine.n
                     (super_portfolio_id, competition_id)
                     VALUE (%i, %i);""" % (pid, compid)
-
+                print "stmt = \n    " + stmt + "\n"
                 cur.execute(stmt)
 
                 stmt = """SELECT LAST_INSERT_ID();"""
@@ -160,8 +244,27 @@ def new_comp_portfolio(pid, compid):
         return cpid
 
 
+def delete_comp_portfolio(cpid):
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """DELETE FROM greed.subportfolio
+                WHERE cpid = %i;""" % (cpid)
+        cur.execute(stmt)
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+
 def buy_stock(pid, stock_id, num_stocks):
-    #print "buy_stock(", pid, ", ", stock_id, ", ", num_stocks, ")"
+    print "buy_stock(", pid, ", ", stock_id, ", ", num_stocks, ")"
 
     try:
         con = connect()

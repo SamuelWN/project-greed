@@ -23,7 +23,7 @@ def connect():
 
 
 def main():
-    #dbg()
+    print sys.argv[1:]
 
     if((sys.argv[1:]) and (sys.argv[1:][0]
     in ['-a', '-d', '-j', '-A', '-m', '-e'])):
@@ -33,8 +33,10 @@ def main():
 
     if opt == '-a':
         print create_new(int(sys.argv[1:][1]),
-                str(sys.argv[1:][2]), float(sys.argv[1:][3]),
-                float(sys.argv[1:][4]), float(sys.argv[1:][5]))
+                str(sys.argv[1:][2]),
+                float(sys.argv[1:][3]),
+                float(sys.argv[1:][4]),
+                float(sys.argv[1:][5]))
     elif opt == '-d':
         delete_comp(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
     elif opt == '-j':
@@ -47,7 +49,8 @@ def main():
         print comp_end(sys.argv[1:][1])
     elif opt == '-h':
         print("""-a UID NAME START END FEE
-            Add new competition\n""")
+            Add new competition
+            (returns 'Competition_ID,Comp_Portfolio_ID')\n""")
         print("""-d UID COMPID
             Delete competition COMPID\n""")
         print("""-j COMPID
@@ -60,11 +63,23 @@ def main():
 
 def all():
     #print "all()"
+    complist = ''
     try:
         con = connect()
         cur = con.cursor()
 
         cur.execute("SELECT * FROM greed.competition;")
+
+        comps = cur.fetchall()
+
+        for acomp in comps:
+            for val in acomp:
+                complist += str(val) + ','
+
+            complist = complist[:-1]
+            complist += '\n'
+
+        complist = complist[:-1]
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -75,26 +90,26 @@ def all():
             con.commit()
             con.close()
 
-        for n in range(cur.rowcount):
-            row = cur.fetchone()
-            return row
+        return complist
 
 
 def create_new(uid, name, start, end, fee):
+    compid = -1
+
     try:
         con = connect()
         cur = con.cursor()
 
         length = end - start
 
-        stmt = """SELECT cash FROM stock_current
+        stmt = """SELECT cash FROM greed.portfolio_value_cash
                 WHERE id = %i;""" % (uid)
         cur.execute(stmt)
         cash = float(cur.fetchone()[0])
 
-        if (cash > fee):
+        if (cash < fee):
             print "Not enough funds"
-        elif (start < time.gmtime):
+        elif (start < time.time()):
             print "'start' time is in the past"
         elif (start > end):
             print "'start' time is after 'end' time"
@@ -106,15 +121,14 @@ def create_new(uid, name, start, end, fee):
                         """ % (uid, name, start, length, fee)
 
             cur.execute(stmt)
+            cur.execute("SELECT LAST_INSERT_ID();")
 
-            stmt = """SELECT id FROM greed.competition
-                    WHERE owner_account_id = '%s'
-                    AND name = '%s'""" % (uid, name)
+            compid = int(cur.fetchone()[0])
 
-            cur.execute(stmt)
-            compid = cur.fetchone()[0]
+            con.commit()
 
-            portfolio_engine.new_comp_portfolio(uid, compid)
+            cpid = portfolio_engine.new_comp_portfolio(uid, compid)
+            portfolio_engine.new_comp_portfolio()
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -124,7 +138,7 @@ def create_new(uid, name, start, end, fee):
         if con:
             con.commit()
             con.close()
-        return compid
+        return str(compid) + ',' + str(cpid)
 
 
 def delete_comp(uid, compid):
@@ -146,7 +160,6 @@ def delete_comp(uid, compid):
                 AND id = %i;""" % (uid, compid)
 
         if(owner == uid):
-            print "owner == uid"
             cur.execute(stmt)
         else:
             print "owner != uid"
@@ -174,7 +187,7 @@ def join_comp(uid, compid):
 
         stime = cur.fetchone()[0]
 
-        if(stime < time.gmtime()):
+        if(stime < time.time()):
             stmt = """SELECT entryfee FROM greed.competition
                 WHERE id = """ + compid + ";"
             cur.execute(stmt)
@@ -213,6 +226,7 @@ def comp_members(compid):
         cur.execute(stmt)
 
         members = cur.fetchall()
+        print "members: ", members
 
         for mem in members:
             ret = ret + str(mem[0]) + ","
@@ -237,7 +251,8 @@ def comp_end(compid):
 
         mems = comp_members(compid)
 
-        stmt = """SELECT * FROM greed.portfolio_value_total
+        stmt = """SELECT id, total_value
+                FROM greed.portfolio_value_total
                 WHERE id IN (""" + mems + """)
                 ORDER BY comp_value DESC LIMIT 5;"""
 
@@ -246,8 +261,9 @@ def comp_end(compid):
         winners = cur.fetchall()
 
         for win in winners:
-            ret = ret + str(win[0]) + ","
+            ret = ret + str(win[0]) + "," + str(win[1]) + '\n'
 
+        ret = ret[:-1]
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
         sys.exit(1)
@@ -256,7 +272,8 @@ def comp_end(compid):
         if con:
             con.commit()
             con.close()
-        return ret[:-1]
+
+        return ret
 
 if __name__ == "__main__":
     sys.exit(main())
