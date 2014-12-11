@@ -3,7 +3,21 @@
 	<head>
 		<title>G.R.E.E.D.</title>
 		<link rel="stylesheet" type="text/css" href="index.css">
-		<script src="chart.min.js"></script>
+		<!--
+		<script src="https://rawgithub.com/highslide-software/highcharts.com/master/js/adapters/standalone-framework.src.js"></script>
+		<script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
+		<script src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="http://code.highcharts.com/stock/highstock.js"></script>
+		-->
+		<!--
+		<script src="https://rawgithub.com/highslide-software/highcharts.com/master/js/adapters/standalone-framework.src.js"></script>
+		-->
+		
+		<script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
+		<script src="http://code.highcharts.com/stock/highstock.js"></script>
+		<script src="http://code.highcharts.com/highcharts.js"></script>
+		
+		
 		<script src="index.js"></script>
 		<script>
 		</script>

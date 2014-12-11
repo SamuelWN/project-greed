@@ -10,11 +10,24 @@ function include(filename) {
 	}
 }
 
-/*
-function include_jquery() {
-	include("jquery.min.js");
-}
-*/
+
+// global chart options
+Highcharts.setOptions({
+	chart: {
+		backgroundColor: "transparent",
+		style: {
+            fontFamily: 'serif'
+        }
+	},
+	credits: {
+		enabled: false
+	},
+	title: {
+		text: null
+	}
+});
+
+
 
 include("header/header.js");
 include("sidebar/sidebar.js");

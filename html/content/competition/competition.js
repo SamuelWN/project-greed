@@ -19,13 +19,6 @@ function Portfolio(name, valueCash, valueStock, valueComp, compEntryFee) {
 	this.valueTotal = this.valueCash + this.valueStock + this.valueComp;
 }
 
-function PortfolioHistorical(unixtime, valueCash, valueComp, countStocks) {
-	this.unixtime = unixtime;
-	this.valueCash = valueCash;
-	this.valueComp = valueComp;
-	this.countStocks = countStocks;
-}
-
 function PortfolioStock(company, symbol, valueTotal, value, count) {
 	this.company = company;
 	this.symbol = symbol;
@@ -270,64 +263,8 @@ Element.prototype.build_portfolioTable = function(portfolioStockList) {
 
 
 
-
-
-
-function portfolioHistory_basechart(renderTarget) {
-	return new Highcharts.StockChart({
-		chart: {
-			renderTo: renderTarget
-		},
-		plotOptions: {
-			area: {
-				stacking: 'normal'
-			}
-		}
-		rangeSelector: {
-			enabled: true
-		}
-	});
-}
-
-
-
-function stockHistory_addchart(chart, dataName, dataTarget) {
-	chart.addSeries({
-		name: dataName,
-		data: dataTarget,
-	});
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 // TODO: make this apply to actual portfolios
 var myPortfolio = new Portfolio("Portfolio1", 5000, 7500, 0);
-
-var myPortfolioHistory = [
-	new PortfolioHistorical(1417805000, 9925.00, 0.00, ["GOOG"=1]),
-	new PortfolioHistorical(1417805053, 9525.00, 400.00, ["GOOG"=1]),
-	new PortfolioHistorical(1417891550, 9230.00, 400.00, ["AAPL"=1, "GOOG"=5]),
-	new PortfolioHistorical(1417891551, 9140.00, 400.00, ["AAPL"=1,"GOOG"=6]),
-	new PortfolioHistorical(1417891552, 9220.00, 400.00, ["GOOG"=6]),
-	new PortfolioHistorical(1417891553, 9320.00, 500.00, ["GOOG"=4]),
-	new PortfolioHistorical(1417891556, 9270.00, 550.00, ["GOOG"=4]),
-	new PortfolioHistorical(1417977953, 9170.00, 650.00, ["GOOG"=4]),
-	new PortfolioHistorical(1417977956, 9220.00, 600.00, ["GOOG"=4]),
-	new PortfolioHistorical(1418064353, 9820.00, 0.00, ["GOOG"=4])
-];
-
-
-
 
 // TODO: make this apply to actual portfolio stocks
 var portfolioStocks = [

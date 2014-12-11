@@ -1,3 +1,8 @@
 <div id="content">
-	<!--#include virtual="portfolio/portfolio.shtml"-->
+	<div id="title" class="title">
+	</div>
+	<div id="summary">
+	</div>
+	<div id="detail"> 
+	</div>
 </div>
