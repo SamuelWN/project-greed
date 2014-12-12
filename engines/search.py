@@ -27,6 +27,7 @@ def main(term):
         for a_res in results:
             ret = ret + a_res[0] + "," + a_res[1] + '\n'
 
+        ret = ret[:-1]
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
         sys.exit(1)
