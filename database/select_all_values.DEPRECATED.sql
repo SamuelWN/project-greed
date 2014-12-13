@@ -1,5 +1,8 @@
+SET @p_id = 1;
+SET @p_unixtime = 1417977956;
+
+
 SELECT
-	sub_portfolio_delta.id AS id,
     sub_portfolio_delta.unixtime AS unixtime,
     portfolio_cash_value(sub_portfolio_delta.id, sub_portfolio_delta.unixtime) AS cash_value,
     IFNULL(portfolio_competition_reserved_value(sub_portfolio_delta.id, sub_portfolio_delta.unixtime, false), 0) AS comp_value,
@@ -15,6 +18,11 @@ SELECT
 FROM sub_portfolio_delta
 LEFT OUTER JOIN sub_portfolio_stocks
 	ON sub_portfolio_delta.id = sub_portfolio_stocks.id
-WHERE sub_portfolio_delta.id = 1
+WHERE
+	sub_portfolio_delta.id = @p_id
+    AND CASE WHEN ISNULL(@p_unixtime)
+			THEN true
+			ELSE sub_portfolio_delta.unixtime <= @p_unixtime
+		END
 GROUP BY sub_portfolio_delta.id, sub_portfolio_delta.unixtime
 ;

@@ -1,0 +1,3 @@
+how to use the new history() SQL routine:
+	use "call history([sub_portfolio_id], [unixtime])"
+		([unixtime] specifies the desired end date, pass it as null to make it for the current time)
