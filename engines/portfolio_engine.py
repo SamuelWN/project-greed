@@ -5,7 +5,7 @@ import sys
 import time
 import json
 #from datetime import datetime
-import pdb
+#import pdb
 
 
 def connect():
@@ -113,7 +113,7 @@ def new_super_portfolio(uid, name, cash):
             con.commit()
             con.close()
 
-        return json.dumps({'id':pid})
+        return pid
 
 
 def delete_super_portfolio(spid):
@@ -159,7 +159,7 @@ def new_portfolio(spid):
             con.commit()
             con.close()
 
-        return json.dumps({'id':pid})
+        return pid
 
 
 def delete_portfolio(pid):
@@ -240,7 +240,7 @@ def new_comp_portfolio(pid, compid):
             con.commit()
             con.close()
 
-        return json.dumps({'sub_portfolio_id':int(cpid)})
+        return cpid
 
 
 def delete_comp_portfolio(cpid):
@@ -385,7 +385,7 @@ def find_super_portfolios_uname(uname):
             con.commit()
             con.close()
 
-        return json.dumps({'id':int(ret)})
+        return ret
 
 
 def find_comp_portfolios(uid):
