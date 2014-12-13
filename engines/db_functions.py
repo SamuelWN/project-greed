@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 import MySQLdb as mdb
+import json
 
 
 def connect():
@@ -42,7 +43,7 @@ def portfolio_cash_value(pid, utime):
             con.commit()
             con.close()
 
-        return pcv
+        return json.dumps({'portfolio_cash_value':pcv})
 
 
 def portfolio_competition_reserved_value(pid, utime, future):
@@ -68,7 +69,7 @@ def portfolio_competition_reserved_value(pid, utime, future):
             con.commit()
             con.close()
 
-        return pcrv
+        return json.dumps({'portfolio_competition_reserved_value':pcrv})
 
 
 def portfolio_stock_count(pid, utime, stock):
@@ -93,7 +94,7 @@ def portfolio_stock_count(pid, utime, stock):
             con.commit()
             con.close()
 
-        return psc
+        return json.dumps({'portfolio_stock_count':psc})
 
 
 def portfolio_stock_value(pid, utime, symbl, stockval):
@@ -118,7 +119,7 @@ def portfolio_stock_value(pid, utime, symbl, stockval):
             con.commit()
             con.close()
 
-        return psv
+        return json.dumps({'portfolio_stock_value':psv})
 
 
 if __name__ == "__main__":

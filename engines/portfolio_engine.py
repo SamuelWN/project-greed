@@ -3,6 +3,7 @@
 import MySQLdb as mdb
 import sys
 import time
+import json
 #from datetime import datetime
 import pdb
 
@@ -56,7 +57,7 @@ def main():
     elif opt == '-fs':
         print find_super_portfolios_id(int(sys.argv[1:][1]))
     elif opt == '-fc':
-        print find_comp_portfolios(sys.argv[1:][1])
+        print find_comp_portfolios(int(sys.argv[1:][1]))
     elif opt == '-fstd':
         print find_std_sub_portfolios(int(sys.argv[1:][1]))
     elif opt == '-fA':
@@ -112,7 +113,7 @@ def new_super_portfolio(uid, name, cash):
             con.commit()
             con.close()
 
-        return pid
+        return json.dumps({'id':pid})
 
 
 def delete_super_portfolio(spid):
@@ -158,7 +159,7 @@ def new_portfolio(spid):
             con.commit()
             con.close()
 
-        return pid
+        return json.dumps({'id':pid})
 
 
 def delete_portfolio(pid):
@@ -181,7 +182,7 @@ def delete_portfolio(pid):
 
 
 def new_comp_portfolio(pid, compid):
-    print "new_comp_portfolio(", pid, ", ", compid, ")"
+    #print "new_comp_portfolio(", pid, ", ", compid, ")"
     cpid = -1
     try:
         con = connect()
@@ -217,10 +218,8 @@ def new_comp_portfolio(pid, compid):
                 print "Not enough cash to enter competition"
             else:
                 stmt = """INSERT INTO greed.sub_portfolio
-            cpid = portfolio_engine.n
                     (super_portfolio_id, competition_id)
                     VALUE (%i, %i);""" % (pid, compid)
-                print "stmt = \n    " + stmt + "\n"
                 cur.execute(stmt)
 
                 stmt = """SELECT LAST_INSERT_ID();"""
@@ -241,7 +240,7 @@ def new_comp_portfolio(pid, compid):
             con.commit()
             con.close()
 
-        return cpid
+        return json.dumps({'sub_portfolio_id':int(cpid)})
 
 
 def delete_comp_portfolio(cpid):
@@ -264,7 +263,7 @@ def delete_comp_portfolio(cpid):
 
 
 def buy_stock(pid, stock_id, num_stocks):
-    print "buy_stock(", pid, ", ", stock_id, ", ", num_stocks, ")"
+    #print "buy_stock(", pid, ", ", stock_id, ", ", num_stocks, ")"
 
     try:
         con = connect()
@@ -335,7 +334,8 @@ def sell_stock(pid, stock_id, num_stocks):
 
 
 def find_super_portfolios_id(uid):
-    ret = ""
+    jsonlist = []
+
     try:
         con = connect()
         cur = con.cursor()
@@ -346,8 +346,8 @@ def find_super_portfolios_id(uid):
         folios = cur.fetchall()
 
         if(folios is not None):
-            ret = tuplestocsv(folios)
-            #print ret
+            for folio in folios:
+                jsonlist.append({'id':int(folio[0]), 'account_id':int(folio[1]), 'name':str(folio[2]), 'initial_cash':float(folio[3])})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -358,7 +358,7 @@ def find_super_portfolios_id(uid):
             con.commit()
             con.close()
 
-    return ret
+    return json.dumps(jsonlist)
 
 
 def find_super_portfolios_uname(uname):
@@ -385,23 +385,28 @@ def find_super_portfolios_uname(uname):
             con.commit()
             con.close()
 
-        return ret
+        return json.dumps({'id':int(ret)})
 
 
 def find_comp_portfolios(uid):
-    ret = ""
+    jsonlist = []
+
     try:
         con = connect()
         cur = con.cursor()
 
         stmt = """SELECT id, competition_id FROM sub_portfolio
-                WHERE super_portfolio_id  = %i AND competition_id IS NOT NULL;""" % (uid)
+            WHERE
+                super_portfolio_id  = %i
+            AND
+                competition_id IS NOT NULL;
+            """ % (uid)
         cur.execute(stmt)
         folios = cur.fetchall()
 
         if(folios is not None):
-            ret = tuplestocsv(folios)
-            #print ret
+            for folio in folios:
+                jsonlist.append({'id':int(folio[0]), 'competition_id':int(folio[1])})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -412,11 +417,12 @@ def find_comp_portfolios(uid):
             con.commit()
             con.close()
 
-        return ret
+        return json.dumps(jsonlist)
 
 
 def find_std_sub_portfolios(uid):
-    ret = ""
+    jsonlist = []
+
     try:
         con = connect()
         cur = con.cursor()
@@ -427,8 +433,8 @@ def find_std_sub_portfolios(uid):
         folios = cur.fetchall()
 
         if(folios is not None):
-            ret = tuplestocsv(folios)
-            #print ret
+            for folio in folios:
+                jsonlist.append({'id':folio[0]})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -439,11 +445,12 @@ def find_std_sub_portfolios(uid):
             con.commit()
             con.close()
 
-        return ret
+        return json.dumps(jsonlist)
 
 
 def find_all(uid):
-    ret = ""
+    jsonlist = []
+
     try:
         con = connect()
         cur = con.cursor()
@@ -454,8 +461,8 @@ def find_all(uid):
         folios = cur.fetchall()
 
         if(folios is not None):
-            ret = tuplestocsv(folios)
-            #print ret
+            for folio in folios:
+                jsonlist.append({'id':folio[0], 'super_portfolio_id':folio[1], 'competition_id':folio[2]})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -466,7 +473,7 @@ def find_all(uid):
             con.commit()
             con.close()
 
-        return ret
+        return json.dumps(jsonlist)
 
 
 if __name__ == "__main__":

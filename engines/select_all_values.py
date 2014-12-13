@@ -9,16 +9,16 @@ def connect():
 
 
 def main():
-    pid = -1
-    results = ''
     jsonlist = []
 
-    if(sys.argv[1:]):
-        pid = int(sys.argv[1:][0])
-    else:
-        return -1
-
     try:
+        pid = -1
+
+        if(sys.argv[1:]):
+            pid = int(sys.argv[1:][0])
+        else:
+            return -1
+
         con = connect()
         cur = con.cursor()
 
@@ -48,22 +48,11 @@ WHERE sub_portfolio_delta.id = %i
 GROUP BY sub_portfolio_delta.id, sub_portfolio_delta.unixtime
 """ % (pid)
 
-        #print "stmt:\n    " + stmt + "\n"
         cur.execute(stmt)
-        #print "stmt executed"
         fetch = cur.fetchall()
 
-        #print "len(fetch) = ", len(fetch)
-        #print "fetch:\n" + str(fetch) + '\n'
-
-        jsonlist = []
-
         for line in fetch:
-            jsonlist.append({'id':int(line[0]), 'unixtime':float(line[1]), 'cash_value':float(line[2]), 'comp_value':float(line[3]), 'stock_count':str(line[4])})
-            for val in line:
-                results = results + str(val) + ','
-
-            results = results[:-1] + '\n'
+            jsonlist.append({'id':int(line[0]), 'unixtime':int(line[1]), 'cash_value':float(line[2]), 'comp_value':float(line[3]), 'stock_count':str(line[4])})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -74,9 +63,7 @@ GROUP BY sub_portfolio_delta.id, sub_portfolio_delta.unixtime
             con.commit()
             con.close()
 
-        #return results
         return json.dumps(jsonlist)
-
 
 
 if __name__ == "__main__":
