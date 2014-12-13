@@ -10,7 +10,7 @@ def connect():
 
 def main():
     if((sys.argv[1:]) and
-    (sys.argv[1:][0] in ['-a', '-d', '-j', '-A', '-m', '-e'])):
+    (sys.argv[1:][0] in ['-pcv', '-pcrv', '-psc', '-psv', '-ptcv'])):
         opt = sys.argv[1:][0]
 
     if(opt == '-pcv'):
@@ -21,7 +21,8 @@ def main():
         print portfolio_stock_count(int(sys.argv[1:][1]), float(sys.argv[1:][2]), sys.argv[1:][3])
     if(opt == '-psv'):
         print portfolio_stock_value(int(sys.argv[1:][1]), float(sys.argv[1:][2]), sys.argv[1:][3], float(sys.argv[1:][4]))
-
+    if(opt == '-ptcv'):
+        print portfolio_total_current_value(int(sys.argv[1:][1]))
 
 def portfolio_cash_value(pid, utime):
     pcv = -1.00
@@ -120,6 +121,31 @@ def portfolio_stock_value(pid, utime, symbl, stockval):
             con.close()
 
         return json.dumps({'portfolio_stock_value':psv})
+
+
+def portfolio_total_current_value(pid):
+    ptcv = -1.00
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """greed.portfolio_total_current_value(
+            (%i);
+            """ % (pid)
+        cur.execute(stmt)
+
+        ptcv = float(cur.fetchone()[0])
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+        return json.dumps({'portfolio_stock_value':ptcv})
 
 
 if __name__ == "__main__":
