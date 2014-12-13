@@ -1,15 +1,14 @@
 #!/usr/bin/python
 import sys
 import MySQLdb as mdb
-
+import json
 
 def connect():
     return mdb.connect(host="localhost", user="root", passwd="toor", db="greed")
 
 
 def main(term):
-    results = ''
-    ret = ""
+    jsonlist = []
 
     try:
         con = connect()
@@ -25,9 +24,8 @@ def main(term):
         results = cur.fetchall()
 
         for a_res in results:
-            ret = ret + a_res[0] + "," + a_res[1] + '\n'
+            jsonlist.append({'symbol':a_res[0], 'company':a_res[1]})
 
-        ret = ret[:-1]
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
         sys.exit(1)
@@ -37,12 +35,10 @@ def main(term):
             con.commit()
             con.close()
 
-        return ret
+        return json.dumps(jsonlist)
 
 
 if __name__ == "__main__":
-    if(sys.argv[1:]):
-        term = sys.argv[1:][0]
+    print main(sys.argv[1:][0])
 
-    print main(term)
     sys.exit(1)

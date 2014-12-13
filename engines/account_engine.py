@@ -3,6 +3,7 @@
 import MySQLdb as mdb
 import sys
 import numpy as np
+import json
 #import pdb
 
 
@@ -75,7 +76,6 @@ def find_user(uname):
         cur.execute(statement)
 
         uid = cur.fetchone()[0]
-        #print "uid = cur.fetchone()[0]     =    ", uid
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -86,19 +86,20 @@ def find_user(uname):
             con.commit()
             con.close()
 
-# Testing:
-        print uid
-
-        return uid
+        return json.dumps({'id':uid})
 
 
 # Testing:
 def all():
+    jsonlist = []
+
     try:
         con = connect()
         cur = con.cursor()
 
         cur.execute("SELECT * FROM account;")
+        row = cur.fetchone()
+        jsonlist.append({'id':row[0],'username':row[1]})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -110,8 +111,11 @@ def all():
             con.close()
 
     for n in range(cur.rowcount):
-        row = cur.fetchone()
-        print (row)
+        json.dumps(jsonlist)
+
+###############################################################################
+###    Needs to be rewritten
+###############################################################################
 
 
 def top_5():
@@ -122,7 +126,9 @@ def top_5():
         usr = con.cursor()
         val = con2.cursor()
 
-        stmt = "SELECT total_value FROM greed.portfolio_value_total WHERE id = "
+        stmt = """SELECT total_value
+                FROM greed.portfolio_value_total
+                WHERE id = """
 
         val.execute("SELECT COUNT(*) FROM greed.account")
         numusers = val.fetchone()[0]

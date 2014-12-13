@@ -3,6 +3,7 @@
 import sys
 import MySQLdb as mdb
 import time
+import json
 import portfolio_engine
 
 
@@ -53,6 +54,8 @@ def main():
             (returns 'Competition_ID,Comp_Portfolio_ID')\n""")
         print("""-d UID COMPID
             Delete competition COMPID\n""")
+        print("""-A
+            Print all information for all competitions (past, present, and future)""")
         print("""-j COMPID
             Join competition COMPID\n""")
         print("""-m COMPID
@@ -63,7 +66,7 @@ def main():
 
 def all():
     #print "all()"
-    complist = ''
+    jsonlist = []
     try:
         con = connect()
         cur = con.cursor()
@@ -73,13 +76,7 @@ def all():
         comps = cur.fetchall()
 
         for acomp in comps:
-            for val in acomp:
-                complist += str(val) + ','
-
-            complist = complist[:-1]
-            complist += '\n'
-
-        complist = complist[:-1]
+            jsonlist.append({'id':int(acomp[0]), 'owner_account_id':int(acomp[1]), 'name':str(acomp[2]), 'entryfee':float(acomp[3]), 'unixtime_start':int(acomp[4]), 'unixtime_length':int(acomp[5]), 'cancelled':bool(int(acomp[6]) == 1)})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -90,11 +87,12 @@ def all():
             con.commit()
             con.close()
 
-        return complist
+        return json.dumps(jsonlist)
 
 
 def create_new(uid, name, start, end, fee):
     compid = -1
+    cpid = -1
 
     try:
         con = connect()
@@ -128,7 +126,6 @@ def create_new(uid, name, start, end, fee):
             con.commit()
 
             cpid = portfolio_engine.new_comp_portfolio(uid, compid)
-            portfolio_engine.new_comp_portfolio()
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -138,7 +135,7 @@ def create_new(uid, name, start, end, fee):
         if con:
             con.commit()
             con.close()
-        return str(compid) + ',' + str(cpid)
+        return json.dumps([{'competion_id':int(compid), 'sub_portfolio_id':int(cpid)}])
 
 
 def delete_comp(uid, compid):
@@ -210,11 +207,11 @@ def join_comp(uid, compid):
         if con:
             con.commit()
             con.close()
-        return cpid
+        return json.dumps([{'competition_portfio_id':cpid}])
 
 
 def comp_members(compid):
-    ret = ""
+    jsonlist = []
 
     try:
         con = connect()
@@ -226,10 +223,9 @@ def comp_members(compid):
         cur.execute(stmt)
 
         members = cur.fetchall()
-        print "members: ", members
 
         for mem in members:
-            ret = ret + str(mem[0]) + ","
+            jsonlist.append({'sub_portfolio_id':mem})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -240,7 +236,7 @@ def comp_members(compid):
             con.commit()
             con.close()
 
-        return ret[:-1]
+        return json.dumps(jsonlist)
 
 
 def comp_end(compid):
