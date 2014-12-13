@@ -28,7 +28,6 @@ Highcharts.setOptions({
 });
 
 
-
 include("header/header.js");
 include("sidebar/sidebar.js");
 include("content/content.js");

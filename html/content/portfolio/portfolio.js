@@ -9,12 +9,14 @@ var chartOptions = {
 	tooltipTemplate: "<%if (label){%><%=label%>: $<%}%><%= value %>",
 };
 
-function Portfolio(name, valueCash, valueStock, valueComp, compEntryFee) {
+function Portfolio(name, valueCash, valueStock, valueComp, compEntryFee, listStock, listHistory) {
 	this.name = name;
 	this.valueCash = valueCash;
 	this.valueStock = valueStock;
 	this.valueComp = valueComp;
 	this.compEntryFee = typeof compEntryFee !== 'undefined' ? compEntryFee : undefined;
+	this.listStock = listStock;
+	this.listHistory = listHistory;
 	
 	this.valueTotal = this.valueCash + this.valueStock + this.valueComp;
 }
@@ -26,12 +28,23 @@ function PortfolioHistorical(unixtime, valueCash, valueComp, countStocks) {
 	this.countStocks = countStocks;
 }
 
-function PortfolioStock(company, symbol, valueTotal, value, count) {
-	this.company = company;
+function PortfolioStock(symbol, company, value, count) {
 	this.symbol = symbol;
-	this.valueTotal = valueTotal;
+	this.company = company;
 	this.value = value;
 	this.count = count;
+	
+	this.y = value;
+	this.name = symbol;
+	
+	/*
+	this.y = function() {
+		return this.value;
+	}
+	this.name = function() {
+		return this.symbol;
+	}
+	*/
 }
 
 
@@ -92,6 +105,7 @@ function portfolioTable_td_buysell() {
 	
 	var input_buy = document.createElement("input");
 	input_buy.setAttribute("type", "button");
+	//input_buy.onclick = function() {portfolioHistory_addchart(historyChart, "derp", [[1416805000 * 1000, -1000], [1417977953 * 1000, -1500], [1418805000 * 1000, -2000]])}
 	input_buy.setAttribute("value", "Buy");
 	
 	var input_sell = document.createElement("input");
@@ -165,46 +179,6 @@ function portfolioTitle_span(portfolio) {
 }
 
 
-function portfolioSummary_highcharts(dataTarget, renderTarget) {
-	var chart = new Highcharts.Chart({
-		chart: {
-			renderTo: renderTarget
-		},
-		tooltip: {
-            pointFormat: '<b>${point.y:.2f}</b>'
-        },
-		plotOptions: {
-			pie: {
-				dataLabels: {
-					/*
-					formatter: function() {
-						if(this.y > 0) {
-							return this.y;
-						}
-					}
-					*/
-				}
-			}
-		}
-	});
-	
-	//chart.showLoading();
-	
-	chart.addSeries({
-		type: "pie",
-		name: "value",
-		data: [
-			["Cash", dataTarget.valueCash],
-			["Stock", dataTarget.valueStock],
-			["Competition", dataTarget.valueComp]
-		]
-	});
-	
-	//chart.hideLoading();
-	
-}
-
-
 
 //name, valueTotal, valueCash, valueStock, valueComp
 function portfolioSummary_dl(portfolio) {
@@ -243,14 +217,20 @@ function portfolioSummary_dl(portfolio) {
 	dl.appendChild(dt_comp);
 	dl.appendChild(dd_comp);
 	
-	//dl.appendChild(portfolioSummary_chartjs(portfolio));
+	var info_chart = document.createElement("div");
+	dl.appendChild(info_chart);
 	
-	var portfolio_chart = document.createElement("div");
-	portfolioSummary_highcharts(portfolio, portfolio_chart);
-	dl.appendChild(portfolio_chart);
+	var history_chart = document.createElement("div");
+	dl.appendChild(history_chart);
+	
+	infoChart = portfolioInfo_basechart(info_chart, portfolio.listStock);
+	historyChart = portfolioHistory_basechart(history_chart);
 	
 	return dl;
 }
+
+var historyChart;
+var infoChart;
 
 
 
@@ -270,6 +250,47 @@ Element.prototype.build_portfolioTable = function(portfolioStockList) {
 
 
 
+function portfolioInfo_basechart(renderTarget, dataTarget) {
+	var chart = new Highcharts.Chart({
+		chart: {
+			renderTo: renderTarget
+		},
+		tooltip: {
+            pointFormat: '<b>${point.y:.2f}</b>'
+        },
+		plotOptions: {
+			pie: {
+				dataLabels: {
+					formatter: function() {
+						if(this.y > 0) {
+							return this.point.company;
+						}
+					}
+				}
+			}
+		}
+	});
+	chart.addSeries({
+		type: "pie",
+		name: "value",
+		data: dataTarget
+	});
+	return chart;
+}
+
+/*
+function portfolioInfo_addchart(chart, dataName, dataTarget, dataIndex){
+}
+*/
+
+function portfolioInfo_setchart(chart, dataName, dataTarget) {
+	for (s in chart.series) {
+		if (chart.series[s].name == dataName) {
+			return chart.series[s].setData(dataTarget);
+		}
+	}
+}
+
 
 
 
@@ -280,22 +301,59 @@ function portfolioHistory_basechart(renderTarget) {
 		},
 		plotOptions: {
 			area: {
-				stacking: 'normal'
+				stacking: 'normal',
+				trackByArea: true,
+				//cursor: 'pointer',
+				point: {
+					events: {
+						click: function(e) {
+							portfolioInfo_setchart(infoChart, "value", this.stocks);
+						}
+					}
+				}
 			}
-		}
+		},
+		tooltip: {
+			headerFormat: '<span style="font-size: 10px">{point.key}</span><br/>',
+            pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.x}, ${point.y:.2f}</b><br/>',
+			
+        },
 		rangeSelector: {
 			enabled: true
+		},
+		xAxis: {
+			ordinal: false
 		}
 	});
 }
 
 
 
-function stockHistory_addchart(chart, dataName, dataTarget) {
-	chart.addSeries({
+function portfolioHistory_addchart(chart, dataName, dataTarget, dataIndex) {
+	return chart.addSeries({
 		name: dataName,
 		data: dataTarget,
+		type: 'area',
+		index: dataIndex
 	});
+}
+
+function getStockValue(stock, unixtime) {
+	var values = Object.keys(stockValues[stock]);
+	
+	var bestValue = 0;
+	for (var v in values) {
+		if (values[v] >= unixtime) {
+			if (values[v] == unixtime) {
+				bestValue = values[v];
+			}
+			break;
+		}
+		if(values[v] > bestValue) {
+			bestValue = values[v];
+		}
+	}
+	return stockValues[stock][bestValue];
 }
 
 
@@ -303,39 +361,99 @@ function stockHistory_addchart(chart, dataName, dataTarget) {
 
 
 
-
-
-
-
-
-
-
-// TODO: make this apply to actual portfolios
-var myPortfolio = new Portfolio("Portfolio1", 5000, 7500, 0);
-
-var myPortfolioHistory = [
-	new PortfolioHistorical(1417805000, 9925.00, 0.00, ["GOOG"=1]),
-	new PortfolioHistorical(1417805053, 9525.00, 400.00, ["GOOG"=1]),
-	new PortfolioHistorical(1417891550, 9230.00, 400.00, ["AAPL"=1, "GOOG"=5]),
-	new PortfolioHistorical(1417891551, 9140.00, 400.00, ["AAPL"=1,"GOOG"=6]),
-	new PortfolioHistorical(1417891552, 9220.00, 400.00, ["GOOG"=6]),
-	new PortfolioHistorical(1417891553, 9320.00, 500.00, ["GOOG"=4]),
-	new PortfolioHistorical(1417891556, 9270.00, 550.00, ["GOOG"=4]),
-	new PortfolioHistorical(1417977953, 9170.00, 650.00, ["GOOG"=4]),
-	new PortfolioHistorical(1417977956, 9220.00, 600.00, ["GOOG"=4]),
-	new PortfolioHistorical(1418064353, 9820.00, 0.00, ["GOOG"=4])
-];
-
+function populateHistory(portfolioHistory) {
+	var chartData = {};
+	
+	chartData["cash"] = [];
+	chartData["comp"] = [];
+	chartData["stock"] = [];
+	
+	/*
+	chartData["stock_individual"] = [];
+	for(var v in stockValues) {
+		chartData["stock_individual"][v] = [];
+	}
+	*/
+	
+	for(var h in portfolioHistory) {
+		// CHANGE FOR JSON //////////////////////////////////////////////////////////////////////////////
+		var date = portfolioHistory[h].unixtime * 1000;
+		var valueCash = portfolioHistory[h].cash_value;
+		var valueComp = portfolioHistory[h].comp_value;
+		var countStocks = portfolioHistory[h].stock_count;
+		
+		chartData["cash"].push([date, valueCash]);
+		chartData["comp"].push([date, valueComp]);
+		
+		var valueStockSum = 0;
+		var valueStocks = [];
+		for(var s in stockValues) {
+			var count = countStocks[s];
+			var value = getStockValue(s, date/1000);
+		
+			var valueStock = count * value || 0;
+			//chartData["stock_individual"][s].push([date, valueStock]);
+			valueStockSum += valueStock;
+			valueStocks.push({"name":s, "y":valueStock, "count":count, "value":value});
+		}
+		chartData["stock"].push({"x":date, "y":valueStockSum, "stocks":valueStocks});
+	}
+	
+	
+	portfolioHistory_addchart(historyChart, "cash", chartData["cash"], 2);
+	portfolioHistory_addchart(historyChart, "comp", chartData["comp"], 1);
+	portfolioHistory_addchart(historyChart, "stock", chartData["stock"], 0);
+	
+	/*
+	for (var s in chartData["stock_individual"].reverse()) {
+		console.log(historyChart, test, "stock", s, chartData["stock_individual"][s]);
+		portfolioHistory_addchart_drilldown(historyChart, test, "stock", s, chartData["stock_individual"][s]);
+	}
+	*/
+}
 
 
 
 // TODO: make this apply to actual portfolio stocks
-var portfolioStocks = [
-	new PortfolioStock("Apple Inc.", "AAPL", 1847.52, 115.47, 16),
-	new PortfolioStock("Google Inc.", "GOOG", 3210.18, 535.03, 6)
+var myPortfolioStocks = [
+	{"symbol":"AAPL", "company":"Apple Inc.", "current_value":95.00},
+	{"symbol":"GOOG", "company":"Google Inc.", "current_value":100.00},
 ];
+
+
+var myPortfolioHistory = [
+	{"unixtime":1417805000, "cash_value":9925.00, "comp_value":0.00, "stock_count":{"AAPL":0, "GOOG": 1}},
+	{"unixtime":1417805053, "cash_value":9525.00, "comp_value":400.00, "stock_count":{"AAPL":0, "GOOG": 1}},
+	{"unixtime":1417891550, "cash_value":9230.00, "comp_value":400.00, "stock_count":{"AAPL":1, "GOOG": 5}},
+	{"unixtime":1417891551, "cash_value":9140.00, "comp_value":400.00, "stock_count":{"AAPL":1, "GOOG": 6}},
+	{"unixtime":1417891552, "cash_value":9220.00, "comp_value":400.00, "stock_count":{"AAPL":0, "GOOG": 6}},
+	{"unixtime":1417891553, "cash_value":9320.00, "comp_value":500.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1417891556, "cash_value":9270.00, "comp_value":550.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1417977953, "cash_value":9170.00, "comp_value":650.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1417977956, "cash_value":9220.00, "comp_value":600.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1418064353, "cash_value":9820.00, "comp_value":0.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+];
+
+
+// TODO: make this apply to actual portfolios
+var myPortfolio = new Portfolio("Portfolio1", 5000, 7500, 0, null, myPortfolioStocks, myPortfolioHistory);
+
+var stockValues = {
+	"AAPL":{
+		1417805000: 500
+	},
+	"GOOG":{
+		1417805000: 100,
+		1417977953: 500
+	},
+};
 
 
 document.getElementById("title").build_portfolioTitle(myPortfolio);
 document.getElementById("summary").build_portfolioSummary(myPortfolio);
-document.getElementById("detail").build_portfolioTable(portfolioStocks);
+document.getElementById("detail").build_portfolioTable(myPortfolioStocks);
+
+/*
+populateInfo(myPortfolioStocks);
+*/
+populateHistory(myPortfolioHistory);

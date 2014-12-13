@@ -1,19 +1,23 @@
 function formatYahoo(data) {
-		var quotes = data.query.results.quote;
-		var chartData = new Array();
+		var quotes = data.query.results.quote.reverse();
+		var chartData = {};
 		
 		for(var q in quotes) {
 			console.log(quotes[q].Symbol + ",  " + quotes[q].Date + ",  " + quotes[q].Close);
 			
-			if(chartData[quotes[q].Symbol] == null) {
-				chartData[quotes[q].Symbol] = new Array();
+			var symbol = quotes[q].Symbol;
+			var date = parseInt(new Date(quotes[q].Date).getTime());
+			var close = parseFloat(quotes[q].Close);
+			
+			if(chartData[symbol] == null) {
+				chartData[symbol] = new Array();
 			}
-			chartData[quotes[q].Symbol].push([parseInt(new Date(quotes[q].Date).getTime()), parseFloat(quotes[q].Close)]);
+			chartData[symbol].push([date, close]);
 		}
 		console.log("ran formatYahoo");
 		
 		for (var c in chartData) {
-			stockDetail_addchart(stockChart, c, chartData[c].reverse());
+			stockDetail_addchart(stockChart, c, chartData[c]);
 		}
 }
 
@@ -25,27 +29,13 @@ function Stock(symbol, company, currentValue) {
 	this.company = company;
 	this.currentValue = currentValue;
 	
-	/*
-	this.history = function() {
-		var array = new Array();
-		for (var h in this.historical) {
-			array.push([this.historical[h].getTime(), this.historical[h].value]);
-		}
-		return array;
-	};
-	*/
-	
-	
-	
 	var endDate = new Date();
 	var startDate = new Date();
 	startDate.setFullYear(endDate.getFullYear() - 1);
-	
 	var startDate_string = startDate.getFullYear() + "-" + (startDate.getMonth() + 1) + "-" + startDate.getDate();
-	var endDate_string = "now";
+	var endDate_string = endDate.getFullYear() + "-" + (endDate.getMonth() + 1) + "-" + endDate.getDate();
 	
 	var YQL_base = "http://query.yahooapis.com/v1/public/yql";
-	
 	var YQL_query = "SELECT Symbol, Date, Close " +
 		"FROM yahoo.finance.historicaldata " +
 		"WHERE symbol in ('" + symbol + "') " +
@@ -126,7 +116,7 @@ function stockSummary_highcharts(dataName, dataTarget, renderTarget) {
 	});
 	
 	chart.addSeries({
-		name: "GOOG",
+		name: dataName,
 		data: dataTarget,
 	});
 }
