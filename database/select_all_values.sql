@@ -19,5 +19,6 @@ FROM sub_portfolio_delta
 RIGHT JOIN
 	sub_portfolio_stocks
 		ON sub_portfolio_delta.id = sub_portfolio_stocks.id
+WHERE sub_portfolio_delta.id = 1
 GROUP BY sub_portfolio_delta.id, sub_portfolio_delta.unixtime
 ;

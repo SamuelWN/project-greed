@@ -1,0 +1,4 @@
+how to use the new top5() SQL routine:
+	use "call top5([competition_id])"
+		(pass [competition_id] as null to make it for main sub_portfolios)
+	you can't use a routine with any more SQL, but i made it return just about everything you could ever want
