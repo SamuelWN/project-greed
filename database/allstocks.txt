@@ -1,0 +1,2 @@
+how to use the new allstocks() SQL routine:
+	use "call allstocks([sub_portfolio_id])"
