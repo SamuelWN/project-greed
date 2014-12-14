@@ -27,7 +27,7 @@ def main():
     #print sys.argv[1:]
 
     if((sys.argv[1:]) and (sys.argv[1:][0]
-    in ['-a', '-d', '-j', '-A', '-m', '-t'])):
+    in ['-a', '-d', '-A', '-m', '-t'])):
         opt = sys.argv[1:][0]
     else:
         opt = '-h'
