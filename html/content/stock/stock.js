@@ -1,24 +1,21 @@
 function formatYahoo(data) {
-		var quotes = data.query.results.quote.reverse();
-		var chartData = {};
+	var quotes = data.query.results.quote.reverse();
+	var chartData = {};
+	
+	for(var q in quotes) {
+		var symbol = quotes[q].Symbol;
+		var date = parseInt(new Date(quotes[q].Date).getTime());
+		var close = parseFloat(quotes[q].Close);
 		
-		for(var q in quotes) {
-			console.log(quotes[q].Symbol + ",  " + quotes[q].Date + ",  " + quotes[q].Close);
-			
-			var symbol = quotes[q].Symbol;
-			var date = parseInt(new Date(quotes[q].Date).getTime());
-			var close = parseFloat(quotes[q].Close);
-			
-			if(chartData[symbol] == null) {
-				chartData[symbol] = new Array();
-			}
-			chartData[symbol].push([date, close]);
+		if(chartData[symbol] == null) {
+			chartData[symbol] = [];
 		}
-		console.log("ran formatYahoo");
-		
-		for (var c in chartData) {
-			stockDetail_addchart(stockChart, c, chartData[c]);
-		}
+		chartData[symbol].push([date, close]);
+	}
+	
+	for (var c in chartData) {
+		stockDetail_addchart(stockChart, c, chartData[c]);
+	}
 }
 
 
@@ -93,6 +90,9 @@ function stockDetail_basechart(renderTarget) {
 		},
 		rangeSelector: {
 			enabled: true
+		},
+		xAxis: {
+			ordinal: false
 		}
 	});
 }
