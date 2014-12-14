@@ -36,13 +36,13 @@ def main():
         opt = '-h'
 
     if opt == '-np':
-        new_portfolio(int(sys.argv[1:][1]))
+        print new_portfolio(int(sys.argv[1:][1]))
     elif opt == '-nsp':
-        new_portfolio(int(sys.argv[1:][1]))
+        print new_super_portfolio(int(sys.argv[1:][1]), sys.argv[1:][2], float(sys.argv[1:][3]))
     elif opt == '-dp':
         delete_portfolio(int(sys.argv[1:][1]))
     elif opt == '-dsp':
-        new_portfolio(int(sys.argv[1:][1]))
+        delete_super_portfolio(int(sys.argv[1:][1]))
     elif opt == '-ncp':
         print new_comp_portfolio(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
     elif opt == '-dcp':
@@ -67,7 +67,7 @@ def main():
         print("""-nsp UID NAME CASH
             Create portfolio for account UID of name NAME with initial cash CASH\n""")
         print("""-dsp SPID
-            Dele super_portfolio of id SPID\n""")
+            Delete super_portfolio of id SPID\n""")
         print("""-np SPID
             Create portfolio for super-portfolio SPID\n""")
         print("""-dp PID
@@ -96,16 +96,18 @@ def main():
 
 def new_super_portfolio(uid, name, cash):
     #print "new_portfolio(", pid, ")"
+    pid = -1
 
     try:
         con = connect()
         cur = con.cursor()
 
-        statement = """INSERT INTO super_portfolio
-                    (account_portfolio_id, name, initial_cash)
+        stmt = """INSERT INTO super_portfolio
+                    (account_id, name, initial_cash)
                     VALUE (%i, '%s', %f)
                     """ % (uid, name, cash)
-        cur.execute(statement)
+
+        cur.execute(stmt)
 
         stmt = "SELECT LAST_INSERT_ID();"
         cur.execute(stmt)
