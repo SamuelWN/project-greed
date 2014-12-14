@@ -11,26 +11,13 @@ def connect():
     return mdb.connect(host="localhost", user="root", passwd="toor", db="greed")
 
 
-def tuplestocsv(val_list):
-    ret = ""
-    for vals in val_list:
-        for val in vals:
-            if(val is not None):
-                ret += str(val) + ','
-
-        ret = ret[:-1]
-        ret += "\n"
-
-    return ret[:-1]
-
-
 def main():
     #print sys.argv[1:]
 
     opt = ''
 
     if((sys.argv[1:]) and (sys.argv[1:][0] in
-    ['-np', '-dp', '-nsp', '-dsp', '-ncp', '-dcp' '-b', '-s', '-fsu', '-fs', '-fc', '-fstd', '-fsv', '-fA'])):
+    ['-np', '-dp', '-nsp', '-dsp', '-ncp', '-dcp', '-b', '-s', '-fsu', '-fs', '-fc', '-fstd', '-fsv', '-fA'])):
         opt = sys.argv[1:][0]
     else:
         opt = '-h'
@@ -282,8 +269,7 @@ def buy_stock(pid, stock_id, num_stocks):
         cur.execute(stmt)
         stock_val = float(cur.fetchone()[0]) * num_stocks
 
-        stmt = """SELECT cash FROM portfolio_value_cash
-                WHERE id = %i;""" % (pid)
+        stmt = """SELECT greed.portfolio_cash_value(%i, '%i');""" % (pid, time.time())
         cur.execute(stmt)
         cash = float(cur.fetchone()[0])
 
@@ -315,8 +301,7 @@ def sell_stock(pid, stock_id, num_stocks):
         con = connect()
         cur = con.cursor()
 
-        stmt = """SELECT stock_count FROM portfolio_stocks
-                WHERE id = %i;""" % (pid)
+        stmt = """SELECT greed.portfolio_stock_count(%i, '%i', '%s');""" % (pid, time.time(), stock_id)
         cur.execute(stmt)
         owned = int(cur.fetchone()[0])
 
