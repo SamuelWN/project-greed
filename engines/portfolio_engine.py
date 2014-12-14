@@ -4,7 +4,6 @@ import MySQLdb as mdb
 import sys
 import time
 import json
-#from datetime import datetime
 #import pdb
 
 
@@ -31,7 +30,7 @@ def main():
     opt = ''
 
     if((sys.argv[1:]) and (sys.argv[1:][0] in
-    ['-np', '-dp', '-nsp', '-dsp', '-ncp', '-b', '-s', '-fsu', '-fs', '-fc', '-fstd', '-fA'])):
+    ['-np', '-dp', '-nsp', '-dsp', '-ncp', '-dcp' '-b', '-s', '-fsu', '-fs', '-fc', '-fstd', '-fsv', '-fA'])):
         opt = sys.argv[1:][0]
     else:
         opt = '-h'
@@ -62,11 +61,17 @@ def main():
         print find_std_sub_portfolios(int(sys.argv[1:][1]))
     elif opt == '-fA':
         print find_all(int(sys.argv[1:][1]))
+    elif opt == '-fsv':
+        print find_sup_vals(int(sys.argv[1:][1]))
     elif opt == '-h':
+        print("""-nsp UID NAME CASH
+            Create portfolio for account UID of name NAME with initial cash CASH\n""")
+        print("""-dsp SPID
+            Dele super_portfolio of id SPID\n""")
         print("""-np SPID
             Create portfolio for super-portfolio SPID\n""")
-        print("""-dp SPID
-            Create portfolio for super-portfolio SPID\n""")
+        print("""-dp PID
+            Delete sub_portfolio of id PID\n""")
         print("""-ncp SPID COMPETITION_ID
             Create competition portfolio for super-portfolio SPID\n""")
         print("""-dcp CPID
@@ -75,16 +80,18 @@ def main():
             Buy #STOCKS number of stock STOCK for sub-portfolio PID\n""")
         print("""-s PID STOCK #STOCKS
             Sell #STOCKS number of stock STOCK for sub-portfolio PID\n""")
+        print("""-fsv UID
+            Get the total value for all subportfolios assocated with user UID\n""")
         print("""-fsU UNAME
             Get all super-portfolios for user by username UNAME\n""")
         print("""-fs UID
             Get all super-portfolios for user by user id UID\n""")
-        print("""-fc UID
+        print("""-fc SPID
             Get all competition portfolios for user UID\n""")
-        print("""-fstd UID
-            Get all standard (non-competition) sub-portfolios for user UID""")
-        print("""-fA UID
-            Get all sub-portfolios for user UID\n""")
+        print("""-fstd SPID
+            Get all standard (non-competition) sub-portfolios for super_portfolio_id SPID\n""")
+        print("""-fA SPID
+            Get all sub_portfolios for super_portfolio_id SPID\n""")
 
 
 def new_super_portfolio(uid, name, cash):
@@ -137,7 +144,7 @@ def delete_super_portfolio(spid):
 
 def new_portfolio(spid):
     #print "new_portfolio(", pid, ")"
-
+    pid = -1
     try:
         con = connect()
         cur = con.cursor()
@@ -197,8 +204,7 @@ def new_comp_portfolio(pid, compid):
         cpid = int(cur.fetchone()[0])
 
         if (cpid == 0):
-            stmt = """SELECT cash FROM greed.portfolio_value_cash
-                WHERE id = %i;""" % (pid)
+            stmt = """SELECT greed.portfolio_cash_value(%i, %i)""" % (pid, time.time())
             cur.execute(stmt)
             cash = float(cur.fetchone()[0])
 
@@ -448,7 +454,47 @@ def find_std_sub_portfolios(uid):
         return json.dumps(jsonlist)
 
 
-def find_all(uid):
+def find_sup_vals(uid):
+    jsonlist = []
+
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """SELECT id, name FROM greed.super_portfolio
+                WHERE account_id = %i;""" % (uid)
+        cur.execute(stmt)
+        folios = cur.fetchall()
+
+        stmt = """SELECT id FROM greed.sub_portfolio
+                WHERE super_portfolio_id = %i
+                AND competition_id IS NULL;"""
+        cashstmt = "SELECT greed.portfolio_total_current_value(%i);"
+
+        pval = 0.0
+        if(folios is not None):
+            for folio in folios:
+                cur.execute(stmt % (folio[0]))
+                pid = int(cur.fetchone()[0])
+
+                cur.execute(cashstmt % (pid))
+                pval = pval + float(cur.fetchone()[0])
+
+                jsonlist.append({'id':folio[0], 'name':folio[1], 'total_current_value':pval})
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+        return json.dumps(jsonlist)
+
+
+def find_all(spid):
     jsonlist = []
 
     try:
@@ -456,7 +502,7 @@ def find_all(uid):
         cur = con.cursor()
 
         stmt = """SELECT * FROM sub_portfolio
-                WHERE id  = %i;""" % (uid)
+                WHERE super_portfolio_id  = %i;""" % (spid)
         cur.execute(stmt)
         folios = cur.fetchall()
 

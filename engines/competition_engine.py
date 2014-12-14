@@ -24,10 +24,10 @@ def connect():
 
 
 def main():
-    print sys.argv[1:]
+    #print sys.argv[1:]
 
     if((sys.argv[1:]) and (sys.argv[1:][0]
-    in ['-a', '-d', '-j', '-A', '-m', '-e'])):
+    in ['-a', '-d', '-j', '-A', '-m', '-t'])):
         opt = sys.argv[1:][0]
     else:
         opt = '-h'
@@ -40,28 +40,23 @@ def main():
                 float(sys.argv[1:][5]))
     elif opt == '-d':
         delete_comp(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
-    elif opt == '-j':
-        join_comp(sys.argv[1:][1], str(sys.argv[1:][2]))
+    #elif opt == '-j':
+        #print join_comp(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
     elif opt == '-A':
         print all()
     elif opt == '-m':
-        print comp_members(sys.argv[1:][1])
-    elif opt == '-e':
-        print comp_end(sys.argv[1:][1])
+        print comp_members(int(sys.argv[1:][1]))
+    elif opt == '-t':
+        print top_5(int(sys.argv[1:][1]))
     elif opt == '-h':
-        print("""-a UID NAME START END FEE
-            Add new competition
-            (returns 'Competition_ID,Comp_Portfolio_ID')\n""")
-        print("""-d UID COMPID
-            Delete competition COMPID\n""")
-        print("""-A
-            Print all information for all competitions (past, present, and future)""")
-        print("""-j COMPID
-            Join competition COMPID\n""")
-        print("""-m COMPID
-            List all members of competition COMPID\n""")
-        print("""-e COMPID
-            Determine the top 5 players in competition COMPID""")
+        print("""-a UID NAME START END FEE    Add new competition
+                            (Returns 'Competition_ID,Comp_Portfolio_ID')\n""")
+        print("""-d UID COMPID                Delete competition COMPID\n""")
+        print("""-A                           Print all information for all competitions
+                            (Past, Present, and Future)\n""")
+        #print("""-j COMPID                    Join competition COMPID\n""")
+        print("""-m COMPID                    List all members of competition COMPID\n""")
+        print("""-t COMPID                    Determine the top 5 players in competition COMPID""")
 
 
 def all():
@@ -100,8 +95,7 @@ def create_new(uid, name, start, end, fee):
 
         length = end - start
 
-        stmt = """SELECT cash FROM greed.portfolio_value_cash
-                WHERE id = %i;""" % (uid)
+        stmt = """SELECT greed.portfolio_total_current_value(%i);""" % (uid)
         cur.execute(stmt)
         cash = float(cur.fetchone()[0])
 
@@ -117,12 +111,12 @@ def create_new(uid, name, start, end, fee):
                         unixtime_length, entryfee)
                     VALUES('%s','%s', %f, %f, %f);
                         """ % (uid, name, start, length, fee)
-
+            print "stmt = \n\t%s\n" % (stmt)
             cur.execute(stmt)
             cur.execute("SELECT LAST_INSERT_ID();")
 
             compid = int(cur.fetchone()[0])
-
+            print "compid: " + str(compid)
             con.commit()
 
             cpid = portfolio_engine.new_comp_portfolio(uid, compid)
@@ -135,6 +129,7 @@ def create_new(uid, name, start, end, fee):
         if con:
             con.commit()
             con.close()
+
         return json.dumps([{'competion_id':int(compid), 'sub_portfolio_id':int(cpid)}])
 
 
@@ -178,7 +173,7 @@ def join_comp(uid, compid):
         cur = con.cursor()
 
         stmt = """SELECT unixtime_start FROM greed.competition
-                WHERE id = """ + compid + ";"
+                WHERE id = %i;""" % (compid)
 
         cur.execute(stmt)
 
@@ -186,18 +181,11 @@ def join_comp(uid, compid):
 
         if(stime < time.time()):
             stmt = """SELECT entryfee FROM greed.competition
-                WHERE id = """ + compid + ";"
-            cur.execute(stmt)
-            fee = float(cur.fetchone()[0])
+                WHERE id = %i;""" % (compid)
+            #cur.execute(stmt)
+            #fee = float(cur.fetchone()[0])
 
-            stmt = """SELECT cash FROM portfolio_value_cash
-                WHERE id = """ + uid + ";"
-
-            cur.execute(stmt)
-            cash = float(cur.fetchone()[0])
-
-            if(fee < cash):
-                cpid = portfolio_engine.new_comp_portfolio(uid, compid)
+            cpid = portfolio_engine.new_comp_portfolio(uid, compid)
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -218,7 +206,7 @@ def comp_members(compid):
         cur = con.cursor()
 
         stmt = """SELECT id FROM greed.sub_portfolio
-                WHERE competition_id = """ + compid + ";"
+                WHERE competition_id = %i;""" % (compid)
 
         cur.execute(stmt)
 
@@ -239,37 +227,27 @@ def comp_members(compid):
         return json.dumps(jsonlist)
 
 
-def comp_end(compid):
-    ret = ""
+def top_5(compid):
+    jsonlist = []
+
     try:
         con = connect()
         cur = con.cursor()
 
-        mems = comp_members(compid)
-
-        stmt = """SELECT id, total_value
-                FROM greed.portfolio_value_total
-                WHERE id IN (""" + mems + """)
-                ORDER BY comp_value DESC LIMIT 5;"""
-
+        stmt = """call greed.top5('%i');""" % (compid)
         cur.execute(stmt)
+        top = cur.fetchall()
 
-        winners = cur.fetchall()
+        for a_top in top:
+            jsonlist.append({'competition_name':str(a_top[5]), 'id':int(a_top[0]), 'account_id':int(a_top[3]), 'account_username':str(a_top[6]), 'total_value':float(a_top[7])})
 
-        for win in winners:
-            ret = ret + str(win[0]) + "," + str(win[1]) + '\n'
-
-        ret = ret[:-1]
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
         sys.exit(1)
 
     finally:
-        if con:
-            con.commit()
-            con.close()
+        return json.dumps(jsonlist)
 
-        return ret
 
 if __name__ == "__main__":
     sys.exit(main())

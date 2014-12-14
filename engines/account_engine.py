@@ -2,7 +2,6 @@
 
 import MySQLdb as mdb
 import sys
-import numpy as np
 import json
 #import pdb
 
@@ -22,13 +21,13 @@ def main():
         opt = '-h'
 
     if opt == '-a':
-        add_user(sys.argv[1:][1])
+        print add_user(sys.argv[1:][1])
     elif opt == '-f':
-        find_user(sys.argv[1:][1])
+        print find_user(sys.argv[1:][1])
     elif opt == '-t':
-        top_5()
+        print top_5()
     elif opt == '-A':
-        all()
+        print all()
     elif opt == '-h':
         print("-a USERNAME           Add user USERNAME to database")
         print("-f USERNAME           Find user USERNAME in the databse")
@@ -89,7 +88,6 @@ def find_user(uname):
         return json.dumps({'id':uid})
 
 
-# Testing:
 def all():
     jsonlist = []
 
@@ -98,8 +96,12 @@ def all():
         cur = con.cursor()
 
         cur.execute("SELECT * FROM account;")
-        row = cur.fetchone()
-        jsonlist.append({'id':row[0],'username':row[1]})
+        acnts = cur.fetchall()
+
+        print "acnts: \n\t%s\n" % (str(acnts))
+
+        for usr in acnts:
+            jsonlist.append({'id':usr[0],'username':usr[1]})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -109,74 +111,28 @@ def all():
         if con:
             con.commit()
             con.close()
-
-    for n in range(cur.rowcount):
-        json.dumps(jsonlist)
-
-###############################################################################
-###    Needs to be rewritten
-###############################################################################
+        return json.dumps(jsonlist)
 
 
 def top_5():
-    ret = [''][0]
+    jsonlist = []
+
     try:
         con = connect()
-        con2 = connect()
-        usr = con.cursor()
-        val = con2.cursor()
+        cur = con.cursor()
 
-        stmt = """SELECT total_value
-                FROM greed.portfolio_value_total
-                WHERE id = """
+        cur.execute("call greed.top5(Null);")
+        top = cur.fetchall()
 
-        val.execute("SELECT COUNT(*) FROM greed.account")
-        numusers = val.fetchone()[0]
-
-        usr.execute("SELECT id FROM account;")
-
-        sums = [[0, 0] for x in range(numusers)]
-
-        ret = [["", 0.00] for x in range(5 if (numusers >= 5) else numusers)]
-
-        i = 0
-        while i < numusers:
-            sums[i][0] = int(usr.fetchone()[0])
-            val.execute(stmt + str(sums[i][0]) + ";")
-            sums[i][1] = float(str(val.fetchone()).split("'")[1])
-
-            i = i + 1
-
-        sums = np.matrix(sums)
-        sums.sort(axis=1, kind='mergesort')
-        ordered_sums = sums[::-1].tolist()
-
-        stmt = "SELECT username FROM greed.account WHERE id = "
-
-        i = 0
-        while i < (5 if (numusers >= 5) else numusers):
-            usr.execute(stmt + str(int(ordered_sums[i][0])) + ";")
-            ret[i][0] = str(usr.fetchone()).split("'")[1]
-            ret[i][1] = ordered_sums[i][1]
-
-            i = i + 1
+        for a_top in top:
+            jsonlist.append({'id':int(a_top[0]), 'super_portfolio_name':str(a_top[4]),'account_id':int(a_top[3]), 'account_username':str(a_top[6]), 'total_value':float(a_top[7])})
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
         sys.exit(1)
 
     finally:
-        if con:
-            con.commit()
-            con.close()
-
-# Testing:
-        i = 0
-        while i < (5 if (numusers >= 5) else numusers):
-            print ret[i][0] + "," + str(ret[i][1])
-            i = i + 1
-
-        return ret
+        return json.dumps(jsonlist)
 
 
 if __name__ == "__main__":
