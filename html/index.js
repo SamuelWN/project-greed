@@ -13,6 +13,9 @@ function include(filename) {
 
 // global chart options
 Highcharts.setOptions({
+	global: {
+		timezoneOffset: new Date().getTimezoneOffset(),
+	},
 	chart: {
 		backgroundColor: "transparent",
 		style: {

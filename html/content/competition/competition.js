@@ -1,101 +1,52 @@
-var chartOptions = {
-	animation: false,
+// var chartOptions = {
+	// animation: false,
 	
-	segmentShowStroke : true,
-	segmentStrokeColor : "black",
-	segmentStrokeWidth : 2,
+	// segmentShowStroke : true,
+	// segmentStrokeColor : "black",
+	// segmentStrokeWidth : 2,
 	
-	showTooltips: true,
-	tooltipTemplate: "<%if (label){%><%=label%>: $<%}%><%= value %>",
-};
+	// showTooltips: true,
+	// tooltipTemplate: "<%if (label){%><%=label%>: $<%}%><%= value %>",
+// };
 
-function Portfolio(name, valueCash, valueStock, valueComp, compEntryFee) {
+function Competition(name, unixtimeStart, unixtimeLength, ownerAccountId, entryfee, members) {
 	this.name = name;
-	this.valueCash = valueCash;
-	this.valueStock = valueStock;
-	this.valueComp = valueComp;
-	this.compEntryFee = typeof compEntryFee !== 'undefined' ? compEntryFee : undefined;
 	
-	this.valueTotal = this.valueCash + this.valueStock + this.valueComp;
+	this.dateStart = new Date();
+	this.dateStart.setTime(unixtimeStart * 1000);
+	
+	this.dateEnd = new Date();
+	this.dateEnd.setTime((unixtimeStart + unixtimeLength) * 1000);
+	
+	this.ownerAccountId = ownerAccountId;
+	this.entryfee = entryfee;
+	
+	this.members = members;
 }
 
-function PortfolioStock(company, symbol, valueTotal, value, count) {
-	this.company = company;
-	this.symbol = symbol;
-	this.valueTotal = valueTotal;
-	this.value = value;
-	this.count = count;
-}
 
-
-/*
-<tr>
-	<th class="company">Company</th>
-	<th>Stock</th>
-	<th>Total Value</th>
-	<th>Value</th>
-	<th>Shares</th>
-</tr>
-*/
-function portfolioTable_tr_th() {
+// /*
+// <tr>
+	// <th class="company">Company</th>
+	// <th>Stock</th>
+	// <th>Total Value</th>
+	// <th>Value</th>
+	// <th>Shares</th>
+// </tr>
+// */
+function competitionTable_tr_th() {
 	var tr = document.createElement("tr");
 	
-	var th_company = document.createElement("th");
-	th_company.className = "company";
-	th_company.appendChild(document.createTextNode("Company"));
-	
-	var th_symbol = document.createElement("th");
-	th_symbol.appendChild(document.createTextNode("Stock"));
+	var th_member = document.createElement("th");
+	th_member.appendChild(document.createTextNode("Member"));
 	
 	var th_valueTotal = document.createElement("th");
 	th_valueTotal.appendChild(document.createTextNode("Total Value"));
 	
-	var th_count = document.createElement("th");
-	th_count.appendChild(document.createTextNode("Shares"));
-	
-	var th_value = document.createElement("th");
-	th_value.appendChild(document.createTextNode("Value"));
-	
-	tr.appendChild(th_company);
-	tr.appendChild(th_symbol);
+	tr.appendChild(th_member);
 	tr.appendChild(th_valueTotal);
-	tr.appendChild(th_count);
-	tr.appendChild(th_value);
 	
 	return tr;
-}
-
-
-/*
-<td>
-	<input type="number" min=1>
-	<button>Buy</button>
-	<button>Sell</button>
-</td>
-*/
-function portfolioTable_td_buysell() {
-	var td = document.createElement("td");
-	
-	var input_number = document.createElement("input");
-	input_number.setAttribute("type", "number");
-	input_number.setAttribute("min", "0");
-	input_number.setAttribute("max", "9999");
-	input_number.setAttribute("maxlength", "5");
-	input_number.setAttribute("placeholder", "0");
-	
-	var input_buy = document.createElement("input");
-	input_buy.setAttribute("type", "button");
-	input_buy.setAttribute("value", "Buy");
-	
-	var input_sell = document.createElement("input");
-	input_sell.setAttribute("type", "submit");
-	input_sell.appendChild(document.createTextNode("Sell"));
-	
-	td.appendChild(input_number);
-	td.appendChild(input_buy);
-	td.appendChild(input_sell);
-	
-	return td;
 }
 
 
@@ -109,138 +60,71 @@ function portfolioTable_td_buysell() {
 	[buysell]
 </tr>
 */
-function portfolioTable_tr_td(portfolioStock) {
+function competitionTable_tr_td(member) {
 	var tr = document.createElement("tr");
 	
-	var td_company = document.createElement("td");
-	td_company.className = "company";
-	td_company.appendChild(document.createTextNode(portfolioStock.company));
-	
-	var td_symbol = document.createElement("td");
-	td_symbol.appendChild(document.createTextNode(portfolioStock.symbol));
+	var td_member = document.createElement("td");
+	td_member.appendChild(document.createTextNode(member.account + " - " + member.portfolio)); //////////////////////////////////////////
 	
 	var td_valueTotal = document.createElement("td");
 	td_valueTotal.className = "dollars";
-	td_valueTotal.appendChild(document.createTextNode(portfolioStock.valueTotal));
+	td_valueTotal.appendChild(document.createTextNode(member.valueTotal)); //////////////////////////////////////////
 	
-	var td_count = document.createElement("td");
-	td_count.appendChild(document.createTextNode(portfolioStock.count));
-	
-	var td_value = document.createElement("td");
-	td_value.className = "dollars";
-	td_value.appendChild(document.createTextNode(portfolioStock.value));
-	
-	tr.appendChild(td_company);
-	tr.appendChild(td_symbol);
+	tr.appendChild(td_member);
 	tr.appendChild(td_valueTotal);
-	tr.appendChild(td_count);
-	tr.appendChild(td_value);
-	tr.appendChild(portfolioTable_td_buysell());
 	
 	return tr;
 }
 
 
-function portfolioTable_table(portfolioStockList) {
+function competitionTable_table(competitionMembers) {
 	var table = document.createElement("table");
-	table.appendChild(portfolioTable_tr_th());
-	for (var portfolioStock in portfolioStockList) {
-		table.appendChild(portfolioTable_tr_td(portfolioStockList[portfolioStock]));
+	table.appendChild(competitionTable_tr_th());
+	for (var member in competitionMembers) {
+		table.appendChild(competitionTable_tr_td(competitionMembers[member]));
 	}
 	return table;
 }
 
 
-function portfolioTitle_span(portfolio) {
-	var span = document.createElement("span");
-	span.appendChild(document.createTextNode(portfolio.name));
-	return span;
+function competitionTitle_span(competition) {
+	return document.createTextNode(competition.name);
 }
 
 
-function portfolioSummary_highcharts(dataTarget, renderTarget) {
-	var chart = new Highcharts.Chart({
-		chart: {
-			renderTo: renderTarget
-		},
-		tooltip: {
-            pointFormat: '<b>${point.y:.2f}</b>'
-        },
-		plotOptions: {
-			pie: {
-				dataLabels: {
-					/*
-					formatter: function() {
-						if(this.y > 0) {
-							return this.y;
-						}
-					}
-					*/
-				}
-			}
-		}
-	});
-	
-	//chart.showLoading();
-	
-	chart.addSeries({
-		type: "pie",
-		name: "value",
-		data: [
-			["Cash", dataTarget.valueCash],
-			["Stock", dataTarget.valueStock],
-			["Competition", dataTarget.valueComp]
-		]
-	});
-	
-	//chart.hideLoading();
-	
-}
-
-
-
-//name, valueTotal, valueCash, valueStock, valueComp
-function portfolioSummary_dl(portfolio) {
+//dateStart, dateEnd, ownerAccountId, entryFee
+function competitionSummary_dl(competition) {
 	var dl = document.createElement("dl");
 	
-	var dt_total = document.createElement("dt");
-	dt_total.appendChild(document.createTextNode("Total Value"));
-	var dd_total = document.createElement("dd");
-	dd_total.className = "dollars";
-	dd_total.appendChild(document.createTextNode(portfolio.valueTotal));
+	var dt_dateStart = document.createElement("dt");
+	dt_dateStart.appendChild(document.createTextNode("Start Date"));
+	var dd_dateStart = document.createElement("dd");
+	dd_dateStart.appendChild(document.createTextNode(competition.dateStart.toString()));
 	
-	var dt_cash = document.createElement("dt");
-	dt_cash.appendChild(document.createTextNode("Cash"));
-	var dd_cash = document.createElement("dd");
-	dd_cash.className = "dollars";
-	dd_cash.appendChild(document.createTextNode(portfolio.valueCash));
+	var dt_dateEnd = document.createElement("dt");
+	dt_dateEnd.appendChild(document.createTextNode("End Date"));
+	var dd_dateEnd = document.createElement("dd");
+	dd_dateEnd.appendChild(document.createTextNode(competition.dateEnd.toString()));
 	
-	var dt_stock = document.createElement("dt");
-	dt_stock.appendChild(document.createTextNode("Stock Value"));
-	var dd_stock = document.createElement("dd");
-	dd_stock.className = "dollars";
-	dd_stock.appendChild(document.createTextNode(portfolio.valueStock));
+	var dt_entryFee = document.createElement("dt");
+	dt_entryFee.appendChild(document.createTextNode("Entry Fee"));
+	var dd_entryFee = document.createElement("dd");
+	dd_entryFee.className = "dollars";
+	dd_entryFee.appendChild(document.createTextNode(competition.entryfee));
 	
-	var dt_comp = document.createElement("dt");
-	dt_comp.appendChild(document.createTextNode("Competition Value"));
-	var dd_comp = document.createElement("dd");
-	dd_comp.className = "dollars";
-	dd_comp.appendChild(document.createTextNode(portfolio.valueComp));
+	var dt_owner = document.createElement("dt");
+	dt_owner.appendChild(document.createTextNode("Creator"));
+	var dd_owner = document.createElement("dd");
+	dd_owner.appendChild(document.createTextNode(competition.ownerAccountId));
 	
-	dl.appendChild(dt_total);
-	dl.appendChild(dd_total);
-	dl.appendChild(dt_cash);
-	dl.appendChild(dd_cash);
-	dl.appendChild(dt_stock);
-	dl.appendChild(dd_stock);
-	dl.appendChild(dt_comp);
-	dl.appendChild(dd_comp);
-	
-	//dl.appendChild(portfolioSummary_chartjs(portfolio));
-	
-	var portfolio_chart = document.createElement("div");
-	portfolioSummary_highcharts(portfolio, portfolio_chart);
-	dl.appendChild(portfolio_chart);
+	dl.appendChild(dt_dateStart);
+	dl.appendChild(dd_dateStart);
+	dl.appendChild(dt_dateEnd);
+	dl.appendChild(dd_dateEnd);
+	dl.appendChild(dt_entryFee);
+	dl.appendChild(dd_entryFee);
+	dl.appendChild(dt_owner);
+	dl.appendChild(dd_owner);
 	
 	return dl;
 }
@@ -248,31 +132,34 @@ function portfolioSummary_dl(portfolio) {
 
 
 
-Element.prototype.build_portfolioTitle = function(portfolio) {
-	this.appendChild(portfolioTitle_span(portfolio));
-	
+Element.prototype.build_competitionTitle = function(competition) {
+	this.appendChild(competitionTitle_span(competition));
 }
 
-Element.prototype.build_portfolioSummary = function(portfolio) {
-	this.appendChild(portfolioSummary_dl(portfolio));
+Element.prototype.build_competitionSummary = function(competition) {
+	this.appendChild(competitionSummary_dl(competition));
 }
 
-Element.prototype.build_portfolioTable = function(portfolioStockList) {
-	this.appendChild(portfolioTable_table(portfolioStockList));
+Element.prototype.build_competitionTable = function(competition) {
+	this.appendChild(competitionTable_table(competition.members));
 }
 
 
 
-// TODO: make this apply to actual portfolios
-var myPortfolio = new Portfolio("Portfolio1", 5000, 7500, 0);
-
-// TODO: make this apply to actual portfolio stocks
-var portfolioStocks = [
-	new PortfolioStock("Apple Inc.", "AAPL", 1847.52, 115.47, 16),
-	new PortfolioStock("Google Inc.", "GOOG", 3210.18, 535.03, 6)
+// // TODO: make this apply to actual competition members
+var competitionMembers = [
+	{"account":"a1", "portfolio":"p1", "valueTotal":123.45},
+	{"account":"a2", "portfolio":"p2", "valueTotal":234.56},
+	{"account":"a3", "portfolio":"p3", "valueTotal":345.67},
 ];
 
+// // TODO: make this apply to actual competitions
+var myCompetition = new Competition("comp2", 1417891553, 86400, 1, 500.0, competitionMembers);
 
-document.getElementById("title").build_portfolioTitle(myPortfolio);
-document.getElementById("summary").build_portfolioSummary(myPortfolio);
-document.getElementById("detail").build_portfolioTable(portfolioStocks);
+
+
+
+
+document.getElementById("title").build_competitionTitle(myCompetition);
+document.getElementById("summary").build_competitionSummary(myCompetition);
+document.getElementById("detail").build_competitionTable(myCompetition);

@@ -78,9 +78,9 @@ function StockHistorical(unixtime, value) {
 
 
 function stockTitle_span(stock) {
-	var span = document.createElement("span");
-	span.appendChild(document.createTextNode(stock.symbol + " - " + stock.company));
-	return span;
+	//var span = document.createElement("span");
+	return document.createTextNode(stock.symbol + " - " + stock.company);
+	//return span;
 }
 
 function stockDetail_basechart(renderTarget) {
@@ -114,7 +114,6 @@ function stockSummary_highcharts(dataName, dataTarget, renderTarget) {
 			enabled: true
 		}
 	});
-	
 	chart.addSeries({
 		name: dataName,
 		data: dataTarget,

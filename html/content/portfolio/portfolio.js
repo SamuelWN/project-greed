@@ -2,12 +2,12 @@ function formatYahoo(data) {
 	var quotes = data.query.results.quote.reverse();
 	var chartData = {};
 	
-	for(var q in quotes) {
+	for (var q in quotes) {
 		var symbol = quotes[q].Symbol;
 		var date = parseInt(new Date(quotes[q].Date).getTime());
 		var close = parseFloat(quotes[q].Close);
 		
-		if(chartData[symbol] == null) {
+		if (chartData[symbol] == null) {
 			chartData[symbol] = {};
 		}
 		chartData[symbol][date] = close;
@@ -203,9 +203,9 @@ function portfolioTable_table(portfolio) {
 
 
 function portfolioTitle_span(portfolio) {
-	var span = document.createElement("span");
-	span.appendChild(document.createTextNode(portfolio.name));
-	return span;
+	//var span = document.createElement("span");
+	return document.createTextNode(portfolio.name);
+	//return span;
 }
 
 
@@ -253,7 +253,7 @@ function portfolioSummary_dl(portfolio) {
 	var history_chart = document.createElement("div");
 	dl.appendChild(history_chart);
 	
-	infoChart = portfolioInfo_basechart(info_chart, portfolio.listStock);
+	infoChart = portfolioInfo_basechart(info_chart, portfolio.listStock, portfolio.listHistory.slice(-1)[0].stock_count);
 	historyChart = portfolioHistory_basechart(history_chart);
 	
 	return dl;
@@ -283,11 +283,30 @@ Element.prototype.build_portfolioTable = function(portfolio) {
 }
 
 
-
-function portfolioInfo_basechart(renderTarget, dataTarget) {
+function portfolioInfo_basechart(renderTarget, dataTarget, stockCount) {
+	
+	var dataSum = 0;
+	for (var d in dataTarget) {
+		var symbol = dataTarget[d].symbol;
+		var value = dataTarget[d].current_value;
+		var count = stockCount[symbol]
+		var totalValue = value * count
+		
+		dataTarget[d].y = totalValue;
+		dataTarget[d].name = symbol;
+		
+		dataSum += totalValue;
+	}
+	
 	var chart = new Highcharts.Chart({
 		chart: {
-			renderTo: renderTarget
+			renderTo: renderTarget,
+		},
+		title: {
+			text: "Stock Value: " + "$" + Highcharts.numberFormat(dataSum, 2)
+		},
+		subtitle: {
+			text: Highcharts.dateFormat("%A, %B %e, %Y, at %l:%M:%S%P", new Date().getTime())
 		},
 		tooltip: {
 			headerFormat: '<span style="font-size: 10px">{point.key}</span><br/>',
@@ -297,7 +316,7 @@ function portfolioInfo_basechart(renderTarget, dataTarget) {
 			pie: {
 				dataLabels: {
 					formatter: function() {
-						if(this.y > 0) {
+						if (this.y > 0) {
 							return this.point.company;
 						}
 					}
@@ -305,13 +324,6 @@ function portfolioInfo_basechart(renderTarget, dataTarget) {
 			}
 		}
 	});
-	
-	for(var d in dataTarget) {
-		dataTarget[d].y = dataTarget[d].current_value;
-		dataTarget[d].name = dataTarget[d].symbol;
-	}
-	
-	
 	
 	chart.addSeries({
 		type: "pie",
@@ -321,12 +333,15 @@ function portfolioInfo_basechart(renderTarget, dataTarget) {
 	return chart;
 }
 
-/*
-function portfolioInfo_addchart(chart, dataName, dataTarget, dataIndex){
-}
-*/
-
-function portfolioInfo_setchart(chart, dataName, dataTarget) {
+function portfolioInfo_setchart(chart, dataName, dataTarget, dataTotal, dataTime) {
+	chart.setTitle(
+		{
+			text: "Stock Value: " + "$" + Highcharts.numberFormat(dataTotal, 2)
+		},
+		{
+			text: Highcharts.dateFormat("%A, %B %e, %Y, at %l:%M:%S%P", dataTime)
+		}
+	);
 	for (s in chart.series) {
 		if (chart.series[s].name == dataName) {
 			return chart.series[s].setData(dataTarget);
@@ -346,21 +361,74 @@ function portfolioHistory_basechart(renderTarget) {
 			area: {
 				stacking: 'normal',
 				trackByArea: true,
-				//cursor: 'pointer',
 				point: {
 					events: {
 						click: function(e) {
-							console.log(JSON.stringify(this.stocks));
-							portfolioInfo_setchart(infoChart, "value", this.stocks);
+							var seriesArray = this.series.chart.series
+							for (var s in seriesArray) {
+								if (seriesArray[s].name == "stock") {
+									newThis = seriesArray[s].data[this.index];
+									
+									// alert(Object.getOwnPropertyNames(newThis));
+									
+									portfolioInfo_setchart(infoChart, "value", newThis.stocks, newThis.y, newThis.x);
+								}
+							}
 						}
 					}
 				}
 			}
 		},
 		tooltip: {
+			/*
 			headerFormat: '<span style="font-size: 10px">{point.key}</span><br/>',
-            pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>${point.y:.2f}</b><br/>',
-			
+            pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>${point.y:.2f}</b>, {point.total}<br/>',
+			*/
+			formatter: function() {
+				var format = document.createElement("div");
+				
+				var date = document.createElement("div");
+				date.appendChild(document.createTextNode(Highcharts.dateFormat("%a %m/%d/%y at %H:%M:%S", this.points[0].x)));
+				date.appendChild(document.createElement("br"));
+				date.style.fontSize="x-small";
+				
+				var totalValue = document.createElement("div");
+				totalValue.appendChild(document.createTextNode("$" + Highcharts.numberFormat(this.points[0].total, 2)));
+				totalValue.appendChild(document.createElement("br"));
+				totalValue.style.fontSize="large";
+				totalValue.style.fontWeight="bold";
+				
+				var values = document.createElement("div");
+				
+				format.appendChild(date);
+				format.appendChild(totalValue);
+				format.appendChild(values);
+				
+				for (s in this.points) {
+					var point = document.createElement("div");
+					
+					var bullet = document.createElement("span");
+					bullet.appendChild(document.createTextNode("\u25CF  "));
+					bullet.style.color = this.points[s].series.color;
+					
+					var name = document.createElement("span");
+					name.appendChild(document.createTextNode(this.points[s].series.name));
+					name.appendChild(document.createTextNode(":  "));
+					
+					var value = document.createElement("span");
+					value.appendChild(document.createTextNode("$" + Highcharts.numberFormat(this.points[s].y, 2)));
+					value.style.fontWeight="bold";
+					
+					point.appendChild(bullet);
+					point.appendChild(name);
+					point.appendChild(value);
+					point.appendChild(document.createElement("br"));
+					
+					values.appendChild(point);
+				}
+				//return "<span style='font-size: 10px'>" + "$" + this.y.toFixed(2) + "</span><br/>";
+				return format.innerHTML;
+			},
         },
 		rangeSelector: {
 			enabled: true
@@ -368,7 +436,7 @@ function portfolioHistory_basechart(renderTarget) {
 		xAxis: {
 			ordinal: false
 		}
-	});
+	});	
 }
 
 
@@ -378,7 +446,8 @@ function portfolioHistory_addchart(chart, dataName, dataTarget, dataIndex) {
 		name: dataName,
 		data: dataTarget,
 		type: 'area',
-		index: dataIndex
+		index: dataIndex,
+		cursor: "pointer"
 	});
 }
 
@@ -393,7 +462,7 @@ function getStockValue(stock, unixtime, stockValues) {
 			}
 			break;
 		}
-		if(values[v] < unixtime) {
+		if (values[v] < unixtime) {
 			bestValue = stockValues[stock][values[v]];
 		}
 	}
@@ -407,12 +476,11 @@ function getStockValue(stock, unixtime, stockValues) {
 
 function populateHistory(portfolioHistory, stockValues) {
 	var chartData = {};
-	
 	chartData["cash"] = [];
 	chartData["comp"] = [];
 	chartData["stock"] = [];
 	
-	for(var h in portfolioHistory) {
+	for (var h in portfolioHistory) {
 		var date = portfolioHistory[h].unixtime * 1000;
 		var valueCash = portfolioHistory[h].cash_value;
 		var valueComp = portfolioHistory[h].comp_value;
@@ -432,7 +500,7 @@ function populateHistory(portfolioHistory, stockValues) {
 		}
 		stocksSorted.sort();
 		
-		for(var ss in stocksSorted) {
+		for (var ss in stocksSorted) {
 			var s = stocksSorted[ss];
 			var count = countStocks[s];
 			var value = getStockValue(s, date/1000, stockValues);
@@ -460,15 +528,16 @@ var myPortfolioStocks = [
 // TODO: make this apply to actual portfolio histories
 var myPortfolioHistory = [
 	{"unixtime":1417805000, "cash_value":9925.00, "comp_value":0.00, "stock_count":{"AAPL":0, "GOOG": 1}},
-	{"unixtime":1417805053, "cash_value":9525.00, "comp_value":400.00, "stock_count":{"AAPL":0, "GOOG": 1}},
+	{"unixtime":1417805053, "cash_value":9525.00, "comp_value":0.00, "stock_count":{"AAPL":0, "GOOG": 1}},
 	{"unixtime":1417891550, "cash_value":9230.00, "comp_value":400.00, "stock_count":{"AAPL":1, "GOOG": 5}},
 	{"unixtime":1417891551, "cash_value":9140.00, "comp_value":400.00, "stock_count":{"AAPL":1, "GOOG": 6}},
 	{"unixtime":1417891552, "cash_value":9220.00, "comp_value":400.00, "stock_count":{"AAPL":0, "GOOG": 6}},
-	{"unixtime":1417891553, "cash_value":9320.00, "comp_value":500.00, "stock_count":{"AAPL":0, "GOOG": 4}},
-	{"unixtime":1417891556, "cash_value":9270.00, "comp_value":550.00, "stock_count":{"AAPL":0, "GOOG": 4}},
-	{"unixtime":1417977953, "cash_value":9170.00, "comp_value":650.00, "stock_count":{"AAPL":0, "GOOG": 4}},
-	{"unixtime":1417977956, "cash_value":9220.00, "comp_value":600.00, "stock_count":{"AAPL":0, "GOOG": 4}},
-	{"unixtime":1418064353, "cash_value":9820.00, "comp_value":0.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1417891553, "cash_value":9320.00, "comp_value":400.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1417891556, "cash_value":9270.00, "comp_value":500.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1417977953, "cash_value":9170.00, "comp_value":550.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1417977956, "cash_value":9220.00, "comp_value":650.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1418064353, "cash_value":9820.00, "comp_value":600.00, "stock_count":{"AAPL":0, "GOOG": 4}},
+	{"unixtime":1418288845, "cash_value":9595.00, "comp_value":0.00, "stock_count":{"AAPL":3, "GOOG": 4}},
 ];
 
 
