@@ -10,26 +10,24 @@ function include(filename) {
 	}
 }
 
-
 // global chart options
 Highcharts.setOptions({
-	global: {
-		timezoneOffset: new Date().getTimezoneOffset(),
+	global : {
+		timezoneOffset : new Date().getTimezoneOffset(),
 	},
-	chart: {
-		backgroundColor: "transparent",
-		style: {
-            fontFamily: 'serif'
-        }
+	chart : {
+		backgroundColor : "transparent",
+		style : {
+			fontFamily : 'serif'
+		}
 	},
-	credits: {
-		enabled: false
+	credits : {
+		enabled : false
 	},
-	title: {
-		text: null
+	title : {
+		text : null
 	}
 });
-
 
 include("header/header.js");
 include("sidebar/sidebar.js");

@@ -4,7 +4,7 @@ function footer_span() {
 	return span;
 }
 
-Element.prototype.build_footer = function() {
+Element.prototype.build_footer = function () {
 	this.appendChild(footer_span());
 }
 
