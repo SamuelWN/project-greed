@@ -4,30 +4,21 @@ function Portfolio(id, name, value) {
 	this.value = value;
 }
 
-// TODO: make this apply to actual portfolios and their values
-var myPortfolios = [
-	new Portfolio(1, "Portfolio1", 10001),
-	new Portfolio(2, "Portfolio2", 20020),
-	new Portfolio(5, "Portfolio3", 50000)
-];
-var currentPortfolio = 0;
-
-
 function menu_portfolio_a(portfolio) {
 	var a = document.createElement("a");
-	
+
 	if (portfolio === undefined) {
 		a.appendChild(document.createTextNode("+ new portfolio"));
 	} else {
-		
+
 		var span = document.createElement("span");
 		span.appendChild(document.createTextNode(portfolio.value));
 		span.className = "dollars";
-		
+
 		a.appendChild(document.createTextNode(portfolio.name + " ["));
 		a.appendChild(span);
 		a.appendChild(document.createTextNode("]"));
-		
+
 		/*textNode = document.createTextNode(portfolio.name + " [" + portfolio.value + "]"); */
 	}
 	/* a.appendChild(textNode); */
@@ -43,7 +34,7 @@ function menu_portfolio_li(portfolio) {
 
 Element.prototype.build_portfolio = function (portfolioCurrent, portfolioList) {
 	this.appendChild(menu_portfolio_a(portfolioList[portfolioCurrent]));
-	
+
 	var ul = document.createElement("ul");
 	for (var portfolio in portfolioList) {
 		ul.appendChild(menu_portfolio_li(portfolioList[portfolio]));
@@ -52,8 +43,7 @@ Element.prototype.build_portfolio = function (portfolioCurrent, portfolioList) {
 	this.appendChild(ul);
 }
 
-
-Element.prototype.build_whatif = function() {
+Element.prototype.build_whatif = function () {
 	var a = document.createElement("a");
 	var textNode = document.createTextNode("What If..?");
 	a.appendChild(textNode);
@@ -61,6 +51,13 @@ Element.prototype.build_whatif = function() {
 	this.appendChild(a);
 }
 
+// TODO: make this apply to actual portfolios and their values
+var myPortfolios = [
+	new Portfolio(1, "Portfolio1", 10001),
+	new Portfolio(2, "Portfolio2", 20020),
+	new Portfolio(5, "Portfolio3", 50000)
+];
+var currentPortfolio = 0;
 
 document.getElementById("menu_portfolio").build_portfolio(currentPortfolio, myPortfolios);
 document.getElementById("menu_whatif").build_whatif(currentPortfolio, myPortfolios);

@@ -11,23 +11,11 @@ def connect():
     return mdb.connect(host="localhost", user="root", passwd="toor", db="greed")
 
 
-#def dbg():
-    #print sys.argv[1:]
-    #print "num args: ", len(sys.argv[1:])
-
-    #i = 0
-    #while i < len(sys.argv[1:]):
-        #print 'sys.argv[1:][', str(i), "] = ", sys.argv[1:][int(i)]
-        #i = i + 1
-
-    #print "------------------------------\n"
-
-
 def main():
     #print sys.argv[1:]
 
     if((sys.argv[1:]) and (sys.argv[1:][0]
-    in ['-a', '-d', '-A', '-m', '-t'])):
+    in ['-a', '-d', '-i', '-A', '-m', '-t'])):
         opt = sys.argv[1:][0]
     else:
         opt = '-h'
@@ -40,8 +28,8 @@ def main():
                 float(sys.argv[1:][5]))
     elif opt == '-d':
         delete_comp(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
-    #elif opt == '-j':
-        #print join_comp(int(sys.argv[1:][1]), int(sys.argv[1:][2]))
+    elif opt == '-i':
+        print comp_info(int(sys.argv[1:][1]))
     elif opt == '-A':
         print all()
     elif opt == '-m':
@@ -52,9 +40,9 @@ def main():
         print("""-a UID NAME START END FEE    Add new competition
                             (Returns 'Competition_ID,Comp_Portfolio_ID')\n""")
         print("""-d UID COMPID                Delete competition COMPID\n""")
-        print("""-A                           Print all information for all competitions
+        print("""-i COMPID                    Return all information for competition COMPID\n""")
+        print("""-A                           Return all information for all competitions
                             (Past, Present, and Future)\n""")
-        #print("""-j COMPID                    Join competition COMPID\n""")
         print("""-m COMPID                    List all members of competition COMPID\n""")
         print("""-t COMPID                    Determine the top 5 players in competition COMPID""")
 
@@ -83,6 +71,38 @@ def all():
             con.close()
 
         return json.dumps(jsonlist)
+
+
+def comp_info(compid):
+    #print "comp_info(%i)" % compid
+    jsondict = {}
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM greed.competition
+                    WHERE id = %i;""" % compid)
+
+        info = cur.fetchone()
+
+        jsondict['id'] = int(info[0])
+        jsondict['owner_account_id'] = int(info[1])
+        jsondict['name'] = str(info[2])
+        jsondict['entryfee'] = float(info[3])
+        jsondict['unixtime_start'] = int(info[4])
+        jsondict['unixtime_length'] = int(info[5])
+        jsondict['cancelled'] = bool(int(info[6]) == 1)
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+        return json.dumps(jsondict)
 
 
 def create_new(uid, name, start, end, fee):
@@ -212,8 +232,18 @@ def comp_members(compid):
 
         members = cur.fetchall()
 
+        stmt = "SELECT greed.portfolio_total_current_value(%i)"
+
+        jsondict = {}
+
         for mem in members:
-            jsonlist.append({'sub_portfolio_id':mem})
+            mem = int(mem[0])
+
+            jsondict['sub_portfolio_id'] = mem
+            cur.execute(stmt % (mem))
+            jsondict['total_current_value'] = float(cur.fetchone()[0])
+
+            jsonlist.append(jsondict)
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))

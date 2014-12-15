@@ -10,23 +10,24 @@ function include(filename) {
 	}
 }
 
-
 // global chart options
 Highcharts.setOptions({
-	chart: {
-		backgroundColor: "transparent",
-		style: {
-            fontFamily: 'serif'
-        }
+	global : {
+		timezoneOffset : new Date().getTimezoneOffset(),
 	},
-	credits: {
-		enabled: false
+	chart : {
+		backgroundColor : "transparent",
+		style : {
+			fontFamily : 'serif'
+		}
 	},
-	title: {
-		text: null
+	credits : {
+		enabled : false
+	},
+	title : {
+		text : null
 	}
 });
-
 
 include("header/header.js");
 include("sidebar/sidebar.js");
