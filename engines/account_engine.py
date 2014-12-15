@@ -21,37 +21,52 @@ def main():
         opt = '-h'
 
     if opt == '-a':
-        print add_user(sys.argv[1:][1])
+        print add_user(str(sys.argv[1:][1]))
     elif opt == '-f':
-        print find_user(sys.argv[1:][1])
+        print find_user(str(sys.argv[1:][1]))
+    elif opt == '-iU':
+        print info_uname(str(sys.argv[1:][1]))
+    elif opt == '-iI':
+        print info_id(int(sys.argv[1:][1]))
     elif opt == '-t':
         print top_5()
     elif opt == '-A':
         print all()
     elif opt == '-h':
-        print("-a USERNAME           Add user USERNAME to database")
-        print("-f USERNAME           Find user USERNAME in the databse")
-        print("-t                    Show the top 5 user (by net worth)")
-        print("-A                    Show all user within the database")
+        print("-a UNAME               Add user USERNAME to database")
+        print("-f UNAME               Find user USERNAME in the databse")
+        print("-t                     Show the top 5 user (by net worth)")
+        print("-iU UNAME              Get id for user of username UNAME")
+        print("-iI UID                Get username for user of id UID")
+        print("-A                     Show all user within the database")
 
 
 def add_user(uname):
+    uid = -1
+    spid = -1
+
     try:
         con = connect()
         cur = con.cursor()
 
-        cur.execute("INSERT INTO account (username) VALUES ('" + uname + "');")
+        unallowed = ["", "None", "none", "-1", None]
 
-        statement = """SELECT id FROM greed.account
-                    WHERE username = '%s';""" % (uname)
-        cur.execute(statement)
+        if uname not in unallowed:
 
-        uid = int(cur.fetchone()[0])
+            cur.execute("INSERT INTO account (username) VALUES ('" + uname + "');")
 
-        statement = """INSERT INTO super_portfolio
-                    (account_id, name, initial_cash)
-                    VALUES(%i, 'DefaultPortfolio', 100000);""" % (uid)
-        cur.execute(statement)
+            cur.execute("SELECT LAST_INSERT_ID();")
+
+            uid = int(cur.fetchone()[0])
+
+            statement = """INSERT INTO super_portfolio
+                        (account_id, name, initial_cash)
+                        VALUES(%i, 'DefaultPortfolio', 100000);""" % (uid)
+            cur.execute(statement)
+
+            cur.execute("SELECT LAST_INSERT_ID();")
+
+            spid = int(cur.fetchone()[0])
 
     except mdb.Error as e:
         print(("Error %d: %s" % (e.args[0], e.args[1])))
@@ -61,6 +76,8 @@ def add_user(uname):
         if con:
             con.commit()
             con.close()
+
+        return json.dumps({'account_id':uid, 'super_portfolio_id':spid})
 
 
 def find_user(uname):
@@ -86,6 +103,62 @@ def find_user(uname):
             con.close()
 
         return json.dumps({'id':uid})
+
+
+def info_id(uid):
+    uname = ""
+
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """SELECT username FROM greed.account
+                WHERE id  = %i;""" % (uid)
+        cur.execute(stmt)
+        uname = cur.fetcone()
+
+        if(uname is not None):
+            uname = str(uname[0])
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+    return json.dumps({'username':uname})
+
+
+def info_uname(uname):
+    uid = -1
+    try:
+        con = connect()
+        cur = con.cursor()
+
+        stmt = """SELECT id FROM account
+                WHERE username = '%s';""" % (uname)
+
+        cur.execute(stmt)
+        uid = cur.fetchone()
+
+        if(uid is not None):
+            ret = int(uid[0])
+        else:
+            ret = -1
+
+    except mdb.Error as e:
+        print(("Error %d: %s" % (e.args[0], e.args[1])))
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.commit()
+            con.close()
+
+        return json.dumps({'id':ret})
 
 
 def all():
