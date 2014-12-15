@@ -16,7 +16,7 @@ def main(term):
 
         stmt = """SELECT * FROM greed.stock
                 WHERE
-                    (symbol LIKE '%""" + term + """"%')
+                    (symbol LIKE '%""" + term + """%')
                 OR
                     (company LIKE '%""" + term + """%');"""
 
