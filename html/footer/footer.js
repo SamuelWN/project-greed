@@ -1,7 +1,5 @@
 function footer_span() {
-	var span = document.createElement("span");
-	span.appendChild(document.createTextNode("CS 324, ©" + new Date().getFullYear()));
-	return span;
+	return document.createTextNode("©" + new Date().getFullYear());
 }
 
 Element.prototype.build_footer = function () {

@@ -1,0 +1,20 @@
+#portfolio {
+	display: block;
+}
+
+#portfolio table {
+	width: 90%;
+}
+
+#portfolio th,td {
+	width: auto;
+	min-width: 50px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#portfolio  th.company, td.company {
+	max-width: 200px;
+	min-width: 100px;
+}

@@ -2,11 +2,13 @@ var included = new Array;
 function include(filename) {
 	if (!(included.indexOf(filename) > -1)) {
 		included.push(filename);
-		var head = document.getElementsByTagName('head')[0];
+		//var head = document.getElementsByTagName('head')[0];
+		var js = document.getElementById('js');
 		script = document.createElement('script');
 		script.src = filename;
 		script.type = 'text/javascript';
-		head.appendChild(script);
+		// head.appendChild(script);
+		js.appendChild(script);
 	}
 }
 

@@ -1,7 +1,45 @@
 <div id="header">
 	<div id="header_area">
-		<!--#include virtual="logo/logo.shtml" -->
-		<!--#include virtual="account/account.shtml" -->
+		<div id="logo">
+			<a href=".">G.R.E.E.D.™</a>
+		</div>
+		<div id="account">
+			<ul>
+				<li id="account_first">
+					<a href=".">Login</a>
+				</li>
+				<li>
+					|
+				</li>
+				<li id="account_last">
+					<a href=".">New Account</a>
+				</li>
+			</ul>
+		</div>
 	</div>
-	<!--#include virtual="menu/menu.shtml" -->
+	<div id="menu">
+		<ul>
+			<li id="menu_portfolio">
+			</li>
+			<li id="menu_stocks">
+				<a href="#">Stocks</a>
+				<ul>
+					<li>
+						<a href="#">Find</a>
+					</li>
+				</ul>
+			</li>
+			<li id="menu_competitions">
+				<a href="#">Competitions</a>
+				<ul>
+					<li>
+						<a href="#">Find</a>
+					</li>
+				</ul>
+			</li>
+			<li id="menu_about">
+				<a href="#">About</a>
+			</li>
+		</ul>
+	</div>
 </div>

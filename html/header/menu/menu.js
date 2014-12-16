@@ -43,14 +43,6 @@ Element.prototype.build_portfolio = function (portfolioCurrent, portfolioList) {
 	this.appendChild(ul);
 }
 
-Element.prototype.build_whatif = function () {
-	var a = document.createElement("a");
-	var textNode = document.createTextNode("What If..?");
-	a.appendChild(textNode);
-	a.setAttribute("href", "#");
-	this.appendChild(a);
-}
-
 // TODO: make this apply to actual portfolios and their values
 var myPortfolios = [
 	new Portfolio(1, "Portfolio1", 10001),
@@ -60,4 +52,3 @@ var myPortfolios = [
 var currentPortfolio = 0;
 
 document.getElementById("menu_portfolio").build_portfolio(currentPortfolio, myPortfolios);
-document.getElementById("menu_whatif").build_whatif(currentPortfolio, myPortfolios);
