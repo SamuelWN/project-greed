@@ -20,7 +20,7 @@ def main(term):
 
         cur.execute(stmt)
         results = cur.fetchall()
-        print "results = " + str(results)
+
         stmt = """SELECT value FROM greed.stock_current
                 WHERE stock_symbol = '%s'"""
 
