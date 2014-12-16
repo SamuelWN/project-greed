@@ -2,7 +2,6 @@
 
 import MySQLdb as mdb
 import urllib2
-import time
 import sys
 
 
