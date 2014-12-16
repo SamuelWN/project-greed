@@ -15,7 +15,7 @@ def tuple_to_str(ret):
 
 
 def main():
-    if((sys.argv[1:]) and (sys.argv[1:][0] in ['-a', '-f', '-t', '-A'])):
+    if((sys.argv[1:]) and (sys.argv[1:][0] in ['-a', '-f', '-t', '-A', '-iU', '-iI'])):
         opt = sys.argv[1:][0]
     else:
         opt = '-h'
@@ -115,7 +115,7 @@ def info_id(uid):
         stmt = """SELECT username FROM greed.account
                 WHERE id  = %i;""" % (uid)
         cur.execute(stmt)
-        uname = cur.fetcone()
+        uname = cur.fetchone()
 
         if(uname is not None):
             uname = str(uname[0])
