@@ -186,38 +186,6 @@ def delete_comp(uid, compid):
             con.close()
 
 
-def join_comp(uid, compid):
-    cpid = -1
-    try:
-        con = connect()
-        cur = con.cursor()
-
-        stmt = """SELECT unixtime_start FROM greed.competition
-                WHERE id = %i;""" % (compid)
-
-        cur.execute(stmt)
-
-        stime = cur.fetchone()[0]
-
-        if(stime < time.time()):
-            stmt = """SELECT entryfee FROM greed.competition
-                WHERE id = %i;""" % (compid)
-            #cur.execute(stmt)
-            #fee = float(cur.fetchone()[0])
-
-            cpid = portfolio_engine.new_comp_portfolio(uid, compid)
-
-    except mdb.Error as e:
-        print(("Error %d: %s" % (e.args[0], e.args[1])))
-        sys.exit(1)
-
-    finally:
-        if con:
-            con.commit()
-            con.close()
-        return json.dumps([{'competition_portfio_id':cpid}])
-
-
 def comp_members(compid):
     jsonlist = []
 
