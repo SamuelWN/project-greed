@@ -661,38 +661,45 @@ Element.prototype.build_portfolioTable = function (portfolio) {
 var myPortfolioStocks = [{
 		"symbol" : "AAPL",
 		"company" : "Apple Inc.",
-		"current_value" : 95.00
+		"current_value" : 108.23
 	}, {
 		"symbol" : "GOOG",
 		"company" : "Google Inc.",
-		"current_value" : 100.00
+		"current_value" : 513.80
+	}, {
+		"symbol" : "MSFT",
+		"company" : "Microsoft Corporation",
+		"current_value" : 46.67
 	},
 ];
 
 // TODO: make this apply to actual portfolio histories
 var myPortfolioHistory = [{
-		"unixtime" : 1417805000,
+		"unixtime" : 1417779000,
 		"cash_value" : 9925.00,
 		"comp_value" : 0.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 1
+			"GOOG" : 1,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1417805053,
+		"unixtime" : 1417829400,
 		"cash_value" : 9525.00,
 		"comp_value" : 0.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 1
+			"GOOG" : 1,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1417891550,
+		"unixtime" : 1417865400,
 		"cash_value" : 9230.00,
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 1,
-			"GOOG" : 5
+			"GOOG" : 5,
+			"MSFT" : 0
 		}
 	}, {
 		"unixtime" : 1417891551,
@@ -700,65 +707,91 @@ var myPortfolioHistory = [{
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 1,
-			"GOOG" : 6
+			"GOOG" : 6,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1417891552,
+		"unixtime" : 1417959000,
 		"cash_value" : 9220.00,
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 6
+			"GOOG" : 6,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1417891553,
+		"unixtime" : 1417962900,
 		"cash_value" : 9320.00,
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 4
+			"GOOG" : 4,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1417891556,
+		"unixtime" : 1418037300,
 		"cash_value" : 9270.00,
 		"comp_value" : 500.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 4
+			"GOOG" : 4,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1417977953,
+		"unixtime" : 1418299200,
 		"cash_value" : 9170.00,
 		"comp_value" : 550.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 4
+			"GOOG" : 4,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1417977956,
+		"unixtime" : 1418385600,
 		"cash_value" : 9220.00,
 		"comp_value" : 650.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 4
+			"GOOG" : 4,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1418064353,
+		"unixtime" : 1418493600,
 		"cash_value" : 9820.00,
 		"comp_value" : 600.00,
 		"stock_count" : {
 			"AAPL" : 0,
-			"GOOG" : 4
+			"GOOG" : 4,
+			"MSFT" : 0
 		}
 	}, {
-		"unixtime" : 1418288845,
+		"unixtime" : 1418580000,
 		"cash_value" : 9595.00,
 		"comp_value" : 0.00,
 		"stock_count" : {
 			"AAPL" : 3,
-			"GOOG" : 4
+			"GOOG" : 4,
+			"MSFT" : 0
 		}
-	},
+	}, {
+		"unixtime" : 1418734800,
+		"cash_value" : 9595.00,
+		"comp_value" : 0.00,
+		"stock_count" : {
+			"AAPL" : 3,
+			"GOOG" : 4,
+			"MSFT" : 5
+		}
+	}, {
+		"unixtime" : 1418756400,
+		"cash_value" : 9595.00,
+		"comp_value" : 0.00,
+		"stock_count" : {
+			"AAPL" : 1,
+			"GOOG" : 1,
+			"MSFT" : 1
+		}
+	}
 ];
 
 // TODO: make this apply to actual portfolios
