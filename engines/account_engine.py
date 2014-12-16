@@ -112,7 +112,7 @@ def info_id(uid):
         con = connect()
         cur = con.cursor()
 
-        stmt = """SELECT id, username FROM greed.account
+        stmt = """SELECT username FROM greed.account
                 WHERE id  = %i;""" % (uid)
         cur.execute(stmt)
         uname = cur.fetchone()
@@ -129,7 +129,7 @@ def info_id(uid):
             con.commit()
             con.close()
 
-    return json.dumps({'username':uname})
+    return json.dumps({'id':uid, 'username':uname})
 
 
 def info_uname(uname):
@@ -158,7 +158,7 @@ def info_uname(uname):
             con.commit()
             con.close()
 
-        return json.dumps({'id':ret})
+        return json.dumps({'id':ret, 'username':uname})
 
 
 def all():
