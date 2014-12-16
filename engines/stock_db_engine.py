@@ -3,6 +3,7 @@
 import MySQLdb as mdb
 import urllib2
 import time
+import sys
 
 
 def connect():
@@ -39,14 +40,12 @@ def main():
                 comp = (str(val[1])[:-2]).strip()
                 cur.execute(stmt % (symb, comp))
 
-                con.commit()
-
         i = i + 1
 
-# Re-aquire stock data every hour:
-    time.sleep(3600)
-    main()
+    if con:
+        con.commit()
+        con.close()
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
