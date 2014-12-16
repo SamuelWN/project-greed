@@ -9,8 +9,8 @@ function menu_portfolio_a(portfolio) {
 
 	if (portfolio === undefined) {
 		a.appendChild(document.createTextNode("+ new portfolio"));
+		a.href = "." + "?" + "pn=" + 1;
 	} else {
-
 		var span = document.createElement("span");
 		span.appendChild(document.createTextNode(portfolio.value));
 		span.className = "dollars";
@@ -19,10 +19,8 @@ function menu_portfolio_a(portfolio) {
 		a.appendChild(span);
 		a.appendChild(document.createTextNode("]"));
 
-		/*textNode = document.createTextNode(portfolio.name + " [" + portfolio.value + "]"); */
+		a.href = "." + "?" + "p=" + portfolio.id;
 	}
-	/* a.appendChild(textNode); */
-	a.setAttribute("href", "#")
 	return a;
 }
 

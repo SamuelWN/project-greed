@@ -6,11 +6,11 @@ function Account(id, username) {
 Element.prototype.modify_account_first = function (account) {
 	var a_first = this.firstElementChild;
 	a_first.innerHTML = account.username;
-	a_first.setAttribute("href", "#");
+	a_first.href = "#";
 }
 
 Element.prototype.modify_account_last = function () {
 	var a = this.firstElementChild;
 	a.innerHTML = "logout";
-	a.setAttribute("href", "#");
+	a.href = "javascript:clearSession();";
 }

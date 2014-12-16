@@ -15,7 +15,9 @@ function leaderboard_li(topPortfolio) {
 	dt.appendChild(document.createTextNode(topPortfolio.username));
 
 	var a = document.createElement("a");
-	a.setAttribute("href", "#");
+	if (topPortfolio.id != undefined) {
+		a.setAttribute("href", ".?p=" + topPortfolio.id);
+	}
 
 	var dd_portfolio = document.createElement("dd");
 	dd_portfolio.className = "leaderboard_portfolio";

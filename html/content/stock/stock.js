@@ -46,12 +46,6 @@ function Stock(symbol, company, currentValue) {
 		"&env=" + YQL_env +
 		"&callback=" + YQL_callback;
 	};
-
-	this.history = function (renderTarget) {
-		var xmlhttp = new XMLHttpRequest();
-
-		//stockSummary_highcharts(myStock.YQL(), renderTarget);
-	};
 }
 
 function StockHistorical(unixtime, value) {
@@ -139,9 +133,22 @@ Element.prototype.build_stockDetail = function (stock) {
 }
 var stockChart;
 
-// TODO: make this apply to actual stock
-var myStock = new Stock("MSFT", "Microsoft Corporation", 500);
+var myStockSymbol = getUrlParams()["s"];
 
-document.getElementById("title").build_stockTitle(myStock);
-document.getElementById("summary").build_stockSummary(myStock);
-document.getElementById("detail").build_stockDetail(myStock);
+var stockPhp = "/greed/php/stock.php";
+var httpRequest = new XMLHttpRequest;
+httpRequest.onreadystatechange = function () {
+	if (httpRequest.readyState == 4) {
+		if (httpRequest.status == 200) {
+			var responseObject = JSON.parse(this.responseText)[0];
+
+			var myStock = new Stock(responseObject.symbol, responseObject.company, responseObject.value);
+			document.getElementById("title").build_stockTitle(myStock);
+			document.getElementById("summary").build_stockSummary(myStock);
+			document.getElementById("detail").build_stockDetail(myStock);
+
+		}
+	}
+}
+httpRequest.open('GET', stockPhp + "?" + "s=" + myStockSymbol);
+httpRequest.send();
