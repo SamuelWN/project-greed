@@ -87,7 +87,7 @@ def find_user(uname):
         con = connect()
         cur = con.cursor()
 
-        statement = """SELECT id FROM greed.account
+        statement = """SELECT id, username FROM greed.account
                     WHERE username = '%s';""" % (uname)
         cur.execute(statement)
 
@@ -112,7 +112,7 @@ def info_id(uid):
         con = connect()
         cur = con.cursor()
 
-        stmt = """SELECT username FROM greed.account
+        stmt = """SELECT id, username FROM greed.account
                 WHERE id  = %i;""" % (uid)
         cur.execute(stmt)
         uname = cur.fetchone()
