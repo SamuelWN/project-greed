@@ -676,7 +676,7 @@ var myPortfolioStocks = [{
 // TODO: make this apply to actual portfolio histories
 var myPortfolioHistory = [{
 		"unixtime" : 1417779000,
-		"cash_value" : 9925.00,
+		"cash_value" : 1925.00,
 		"comp_value" : 0.00,
 		"stock_count" : {
 			"AAPL" : 0,
@@ -685,8 +685,8 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1417829400,
-		"cash_value" : 9525.00,
-		"comp_value" : 0.00,
+		"cash_value" : 1525.00,
+		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 0,
 			"GOOG" : 1,
@@ -694,7 +694,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1417865400,
-		"cash_value" : 9230.00,
+		"cash_value" : 1230.00,
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 1,
@@ -703,7 +703,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1417891551,
-		"cash_value" : 9140.00,
+		"cash_value" : 1140.00,
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 1,
@@ -712,7 +712,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1417959000,
-		"cash_value" : 9220.00,
+		"cash_value" : 1220.00,
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 0,
@@ -721,7 +721,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1417962900,
-		"cash_value" : 9320.00,
+		"cash_value" : 1320.00,
 		"comp_value" : 400.00,
 		"stock_count" : {
 			"AAPL" : 0,
@@ -730,7 +730,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1418037300,
-		"cash_value" : 9270.00,
+		"cash_value" : 1270.00,
 		"comp_value" : 500.00,
 		"stock_count" : {
 			"AAPL" : 0,
@@ -739,7 +739,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1418299200,
-		"cash_value" : 9170.00,
+		"cash_value" : 1170.00,
 		"comp_value" : 550.00,
 		"stock_count" : {
 			"AAPL" : 0,
@@ -748,7 +748,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1418385600,
-		"cash_value" : 9220.00,
+		"cash_value" : 1220.00,
 		"comp_value" : 650.00,
 		"stock_count" : {
 			"AAPL" : 0,
@@ -757,7 +757,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1418493600,
-		"cash_value" : 9820.00,
+		"cash_value" : 1820.00,
 		"comp_value" : 600.00,
 		"stock_count" : {
 			"AAPL" : 0,
@@ -766,7 +766,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1418580000,
-		"cash_value" : 9595.00,
+		"cash_value" : 1595.00,
 		"comp_value" : 0.00,
 		"stock_count" : {
 			"AAPL" : 3,
@@ -775,7 +775,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1418734800,
-		"cash_value" : 9595.00,
+		"cash_value" : 1595.00,
 		"comp_value" : 0.00,
 		"stock_count" : {
 			"AAPL" : 3,
@@ -784,7 +784,7 @@ var myPortfolioHistory = [{
 		}
 	}, {
 		"unixtime" : 1418756400,
-		"cash_value" : 9595.00,
+		"cash_value" : 1595.00,
 		"comp_value" : 0.00,
 		"stock_count" : {
 			"AAPL" : 1,
