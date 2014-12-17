@@ -20,5 +20,17 @@ if (isset($_SESSION["account_id"])) {
 		."\n"."document.getElementById('account_last').modify_account_last(" . $myAccount . ");"
 		;
 	echo $javascript;
+	
+	
+	$myPortfolios = "var myPortfolios = ["
+	."\n"."new Portfolio(1, 'Portfolio1', 10001),"
+	."\n"."new Portfolio(2, 'Portfolio2', 20020),"
+	."\n"."new Portfolio(5, 'Portfolio3', 50000)"
+	."\n"."];"
+	."\n"."var currentPortfolio = 0;"
+	."\n"."document.getElementById('menu_portfolio').build_portfolio(currentPortfolio, myPortfolios);"
+	;
+	
+	echo $myPortfolios;
 }
 ?>

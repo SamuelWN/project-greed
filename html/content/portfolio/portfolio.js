@@ -782,15 +782,6 @@ var myPortfolioHistory = [{
 			"GOOG" : 4,
 			"MSFT" : 5
 		}
-	}, {
-		"unixtime" : 1418756400,
-		"cash_value" : 1595.00,
-		"comp_value" : 0.00,
-		"stock_count" : {
-			"AAPL" : 1,
-			"GOOG" : 1,
-			"MSFT" : 1
-		}
 	}
 ];
 

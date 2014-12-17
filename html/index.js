@@ -21,7 +21,7 @@ function getUrlParams() {
 		var varComponents = vars[v].split('=');
 		var key = varComponents[0];
 		var val = varComponents[1];
-		if (val.trim()) {
+		if (val != undefined && val.trim()) {
 			params[decodeURIComponent(key)] = decodeURIComponent(val);
 		}
 	}
